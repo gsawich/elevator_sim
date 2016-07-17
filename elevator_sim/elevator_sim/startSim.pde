@@ -1,7 +1,5 @@
-import elevator_sim;
 import java.util.concurrent.*;
-
-public class StartSimulation {
+class StartSimulation {
 
   public void main (String[] args) {
       // Simulation events are directed here

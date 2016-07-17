@@ -67,7 +67,6 @@ class Controller {
     bank = new Elevator[NUM_ELEVATORS];
     for (int i=0; i < NUM_ELEVATORS; i++){
       bank[i] = new Elevator();
-      print(bank[i]);
     }
   }
   
@@ -114,7 +113,6 @@ void draw() {
   }
   for (int i = 0; i < NUM_ELEVATORS; i++){
     int x = 50 + (i*100);
-    print('\n',cont, '\n', cont.bank[0]);
     int y = (height-10) - ((cont.getElevator(i).getLocation()) * fheight);
     fill(255);
     rect(x, y, 20, 20);
