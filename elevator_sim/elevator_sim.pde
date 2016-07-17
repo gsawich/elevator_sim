@@ -5,6 +5,7 @@ int MAX_ELEVATOR_CAPACITY = 9;
 int MAX_FLOORS = 30;
 int MAX_EMPLOYEES = 600;
 int MAX_GUESTS = MAX_EMPLOYEES/2;
+int NUM_ELEVATORS = 3;
 long DAY_LENGTH = 90000; // 10 seconds per hour of simulation time
 
 class Person {
