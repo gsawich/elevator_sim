@@ -20,31 +20,60 @@ class Person {
     floor = 0;
     dest = floor(random(MAX_FLOORS+1)); //Person goes to a random floor
     idle_time = 0;
-    type = floor(random(2)); // Either 0 for employee, 1 for guest
+    type = false;
+    single_trip = false;
+    if (random(2) > 1) type = true; // Either false for employee, true for guest
     if (!type) {
-      single_trip = floor(random(2)); //Employees may go to a different floor
-    }
-    else {
-      single_trip = 0; //Guests only have 1 destination
+      if (random(2) > 1) single_trip = true; //Employees may go to a different floor
     }
 }
 
 class Elevator {
-  int location = 0;
-  int direction = 0;
+  int location;
+  int direction;
   boolean full;
   Vector<Person> passengers = new Vector<Person>(MAX_ELEVATOR_CAPACITY);
   LinkedList<Integer> future_event = new LinkedList<Integer>();
+  
+  Elevator() {
+    location = 0;
+    direction = 0;
+    full = false;
+  }
+  
+  int getDirection() {
+    direction = (location - future_event.peek())/(abs(location-future_event.peek()));
+    return direction;
+  }
+  
+  boolean isFull() {
+    if (passengers.size() == MAX_ELEVATOR_CAPACITY)
+      full = true;
+    else
+      full = false;
+    return full;
+  }
 }
 
 class Controller {
-  Vector<Elevator> bank = new Vector<Elevator>(NUM_ELEVATORS);
+  Elevator[] bank = new Elevator[NUM_ELEVATORS];
   
-  void request_elevator(int floor){
+  void request_elevator(int floor, int dir){
     //Find a non-full elevator going in the right direction, then put the request in the future event list
-    for (i=0; i < NUM_ELEVATORS; i++) {
-      if (!(bank[i].full)) {
-        if (bank[i].future_event.peek()
-    
+    int bestDist = MAX_FLOORS; // Worst case
+    int bestEle = 0;
+    for (int i=0; i < NUM_ELEVATORS; i++) {
+      if (!(bank[i].isFull())) { //ignore full elevators
+        if ((bank[i].getDirection()*dir) >=0) { //if elevator is going in the right direction or stopped
+          int dist = (bank[i].location - floor);
+          if (dist < bestDist) {
+            bestDist = dist;
+            bestEle = i;
+          }
+        }
+      }
+    }
+    bank[bestEle].future_event.add(floor);
   }
+}
 }
