@@ -29,4 +29,10 @@ class Controller {
   Elevator getElevator(int i) {
     return bank[i];
   }
+  
+  void inc() {
+    for (Elevator e:bank) {
+      e.move();
+    }
+  }
 }

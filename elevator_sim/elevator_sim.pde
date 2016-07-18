@@ -14,14 +14,16 @@ Controller cont;
 
 void setup() {
   size(300, 480);
-  frameRate(30);
+  frameRate(5 );
   cont = new Controller();
   rectMode(CENTER);
 }
 
 void draw() {
+  clear();
   colorMode(RGB, 255);
   background(80, 0, 250);
+  cont.inc();
   int fheight = (height-15)/MAX_FLOORS;
   for (int i = 0; i < MAX_FLOORS+1; i++){
     int fy = 15 + (i*fheight);
@@ -31,7 +33,10 @@ void draw() {
   for (int i = 0; i < NUM_ELEVATORS; i++){
     int x = 50 + (i*100);
     int y = (height-15) - ((cont.getElevator(i).getLocation()) * fheight);
+    int n = cont.getElevator(i).future_event.peek();
     fill(255);
     rect(x, y, 20, 20);
+    fill(0);
+    text(n, x, y);
   }
 }

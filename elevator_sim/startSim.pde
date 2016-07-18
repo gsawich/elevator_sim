@@ -6,10 +6,10 @@ class StartSimulation {
       // Simulation events are directed here
       Elevator elevator = new Elevator();
       //GENERATE_PEOPLE();
-      FILL_ELEVATOR(elevator, 0); // start filling the initial elevator-request queue
+      //FILL_ELEVATOR(elevator, 0); // start filling the initial elevator-request queue
   }
   
-/* Now Elevator.fill()
+ Now Elevator.fill()
 
 public void FILL_ELEVATOR(Elevator e, int current_floor) {
     // first, process departing passengers
@@ -31,7 +31,7 @@ public void FILL_ELEVATOR(Elevator e, int current_floor) {
       }
     }
   }
-  */
+  
   public void SCHEDULE_FLOOR_QUEUE(final Person p, final int current_floor) {
     final ScheduledThreadPoolExecutor queue_add = new ScheduledThreadPoolExecutor(1);
     queue_add.schedule (new Runnable () {
@@ -41,5 +41,4 @@ public void FILL_ELEVATOR(Elevator e, int current_floor) {
       }  
     }, p.idle_time, TimeUnit.MILLISECONDS);
   }
-}
-*/
+}*/
