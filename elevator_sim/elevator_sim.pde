@@ -1,6 +1,7 @@
 import java.util.Vector;
 import java.util.List;
 import java.util.LinkedList;
+import java.util.Queue;
 
 int MAX_ELEVATOR_CAPACITY = 9;
 int MAX_FLOORS = 30;
@@ -9,6 +10,8 @@ int MAX_GUESTS = MAX_EMPLOYEES/2;
 int NUM_ELEVATORS = 3;
 long DAY_LENGTH = 90000; // 10 seconds per hour of simulation time
 double FPMRATIO = 0.2; // 5 frames per minute of simulation time (30fps)
+Queue[][] ELEVATOR_REQUEST_QUEUE = new Queue[MAX_FLOORS][2];
+
 //Processing Sketch Functions
 Controller cont;
 
@@ -17,6 +20,7 @@ void setup() {
   frameRate(5 );
   cont = new Controller();
   rectMode(CENTER);
+  generate_people();
 }
 
 void draw() {
@@ -38,5 +42,19 @@ void draw() {
     rect(x, y, 20, 20);
     fill(0);
     text(n, x, y);
+  }
+}
+
+void generate_people() {
+  int emp_count = 0;
+  int guest_count = 0;
+  while (emp_count != MAX_EMPLOYEES || guest_count != MAX_GUESTS) {
+    final ScheduledThreadPoolExecutor queue_add = new ScheduledThreadPoolExecutor(1);
+    queue_add.schedule (new Runnable () {
+      @Override 
+      public void run() {
+        ELEVATOR_REQUEST_QUEUE[0][1].add(new Person());
+      }  
+    }, 10000, TimeUnit.MILLISECONDS);
   }
 }
