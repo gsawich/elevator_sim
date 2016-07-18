@@ -5,6 +5,7 @@ class Controller {
     bank = new Elevator[NUM_ELEVATORS];
     for (int i=0; i < NUM_ELEVATORS; i++){
       bank[i] = new Elevator();
+      bank[i].designation_num = i + 1;
     }
   }
   
