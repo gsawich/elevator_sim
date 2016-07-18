@@ -9,7 +9,9 @@ class StartSimulation {
       FILL_ELEVATOR(elevator, 0); // start filling the initial elevator-request queue
   }
   
-  public void FILL_ELEVATOR(Elevator e, int current_floor) {
+/* Now Elevator.fill()
+
+public void FILL_ELEVATOR(Elevator e, int current_floor) {
     // first, process departing passengers
     if (e.passengers.size() != 0) {
       for (int i = 0; i < e.passengers.size(); i++) {
@@ -29,7 +31,7 @@ class StartSimulation {
       }
     }
   }
-  
+  */
   public void SCHEDULE_FLOOR_QUEUE(final Person p, final int current_floor) {
     final ScheduledThreadPoolExecutor queue_add = new ScheduledThreadPoolExecutor(1);
     queue_add.schedule (new Runnable () {
