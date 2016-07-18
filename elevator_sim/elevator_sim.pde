@@ -44,8 +44,12 @@ void generate_people() {
   int emp_count = 0;
   int guest_count = 0;
   while (emp_count != MAX_EMPLOYEES || guest_count != MAX_GUESTS) {
-    Person p;
-    
-    
+    final ScheduledThreadPoolExecutor queue_add = new ScheduledThreadPoolExecutor(1);
+    queue_add.schedule (new Runnable () {
+      @Override 
+      public void run() {
+        ELEVATOR_REQUEST_QUEUE[0][1].add(new Person());
+      }  
+    }, 10000, TimeUnit.MILLISECONDS);
   }
 }
