@@ -1,5 +1,5 @@
 import java.util.concurrent.*;
-
+/*
 class StartSimulation {
 
   public void main (String[] args) {
@@ -10,7 +10,7 @@ class StartSimulation {
   }
   
   public void FILL_ELEVATOR(Elevator e, int current_floor) {
-    // first, process departimg passengers
+    // first, process departing passengers
     if (e.passengers.size() != 0) {
       for (int i = 0; i < e.passengers.size(); i++) {
         if (current_floor == e.passengers.get(i).dest) {
@@ -40,3 +40,4 @@ class StartSimulation {
     }, p.idle_time, TimeUnit.MILLISECONDS);
   }
 }
+*/
