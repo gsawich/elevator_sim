@@ -33,8 +33,12 @@ class Controller {
   }
   
   void inc() {
+    _DEBUG("Call to inc()");
+    
     for (Elevator e:bank) {
       e.move();
     }
+    
+    _DEBUG("Call to inc() completed");
   }
 }

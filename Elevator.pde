@@ -17,15 +17,20 @@ class Elevator {
     speed = 1;
     stopTime = 5;
     designation_num = 0;
+    future_event.add(0);
   }
   
   int getDirection() {
-    if (location-future_event.peek()!=0)
-      direction = (future_event.peek() - location)/(abs(location-future_event.peek()));
+    if (future_event.isEmpty()) // direction is always up for an elevator at floor 0
+      direction = 1;
     else {
-      direction = 0;
-      stopped = true;
-      future_event.pop();
+      if (location - future_event.peek() != 0)
+        direction = (future_event.peek() - location)/(abs(location-future_event.peek()));
+      else {
+        direction = 0;
+        stopped = true;
+        future_event.pop();
+      }
     }
     return direction;
   }
@@ -44,15 +49,18 @@ class Elevator {
   
   void move() {
     if (!stopped){
+      _DEBUG("Elevator #" + designation_num + " :: stopped == false");
       int dir = getDirection(); //-1 for down, 0 for stopped, 1 for up
       location += dir*speed;
     }
-    else if (stopTime > 0) {
+    else if (stopped && stopTime > 0) {
+      _DEBUG("Elevator #" + designation_num + " :: stopped && stopTime > 0");
       fill_elevator();
       stopTime--;
       //print(stopTime); 
     }
-    else if (stopTime == 0){
+    else if (stopped && stopTime == 0){
+      _DEBUG("Elevator #" + designation_num + " :: stopped && stopTime == 0");
       stopped = false;
       //future_event.add(floor(random(MAX_FLOORS)));
       //getDirection();
@@ -62,7 +70,8 @@ class Elevator {
   
   void fill_elevator() {
     // first, process departing passengers
-    if (passengers.size() != 0) {
+    if (passengers.size() > 0) {
+      _DEBUG("Elevator #" + designation_num + " :: fill_elevator() started step 1");
       for (int i = 0; i < passengers.size(); i++) {
         if (location == passengers.get(i).dest) {
           if (location != 0)
@@ -74,12 +83,17 @@ class Elevator {
     
     // second, actually fill the elevator
     if (stopped == true) {
-      for (int i = 0; passengers.size() < MAX_ELEVATOR_CAPACITY; i++) {
-        println("Elevator #" + designation_num + " stopped at floor " + location);
-        if (ELEVATOR_REQUEST_QUEUE.get(location).size() > 0) {
-          Person p = ELEVATOR_REQUEST_QUEUE.get(location).remove(i);
-          passengers.add(p);
-          future_event.add(p.dest);
+      _DEBUG("Elevator #" + designation_num + " :: fill_elevator() started step 2");
+      if (passengers.size() < 9) {
+        for (int i = 0; i < 9; i++) {
+          _DEBUG("Elevator #" + designation_num + " stopped at floor " + location);
+          if (ELEVATOR_REQUEST_QUEUE.get(location).size() > 0 && passengers.size() < MAX_ELEVATOR_CAPACITY) {
+          // if (i < ELEVATOR_REQUEST_QUEUE.get(location).size()) {
+            _DEBUG("i = " + i + " :: ELEVATOR_REQUEST_QUEUE.get(location).size() = " + ELEVATOR_REQUEST_QUEUE.get(location).size());
+            Person p = ELEVATOR_REQUEST_QUEUE.get(location).remove(0);
+            passengers.add(p);
+            //future_event.add(p.dest); // not needed, p.dest should already be on future_event list if SCHEDULE_FLOOR_QUEUE was used to add Person to floor queue
+          }
         }
       }
     }
