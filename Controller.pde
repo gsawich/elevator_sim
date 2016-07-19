@@ -24,7 +24,8 @@ class Controller {
         }
       }
     }
-    bank[bestEle].future_event.add(floor);
+    if (!bank[bestEle].future_event.contains(floor)) // is button pressed?
+      bank[bestEle].future_event.add(floor);
   }
   
   Elevator getElevator(int i) {

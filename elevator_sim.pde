@@ -3,6 +3,9 @@ import java.util.List;
 import java.util.LinkedList;
 import java.util.concurrent.*;
 
+// Set debugging
+final boolean __DEBUG__ = true;
+
 int MAX_ELEVATOR_CAPACITY = 9;
 int MAX_FLOORS = 30;
 int MAX_EMPLOYEES = 600;
@@ -20,21 +23,7 @@ void setup() {
   frameRate(5 );
   cont = new Controller();
   rectMode(CENTER);
-  
-  for (int i = 0; i < MAX_FLOORS; i++)
-    ELEVATOR_REQUEST_QUEUE.add(new Vector<Person>());
-    
-  generate_people();
-  /*
-  for (int i = 0; i < ELEVATOR_REQUEST_QUEUE.get(0).size(); i++) {
-    String person_type;
-    if (ELEVATOR_REQUEST_QUEUE.get(0).get(i).type)
-      person_type = "guest";
-    else
-      person_type = "employee";
-      
-    println("Person #" + i + " is a(n) " + person_type + " and is going to Floor " + ELEVATOR_REQUEST_QUEUE.get(0).get(i).dest);
-  }*/
+  init_system();
 }
 
 void draw() {
@@ -77,5 +66,25 @@ void generate_people() {
         /*
       }  
     }, 10000, TimeUnit.MILLISECONDS);*/
+  }
+}
+
+void init_system() {
+  for (int i = 0; i < MAX_FLOORS; i++)
+    ELEVATOR_REQUEST_QUEUE.add(new Vector<Person>());
+    
+  generate_people();
+  
+  if (__DEBUG__) {
+    // Test for working 3D Vector
+    for (int i = 0; i < ELEVATOR_REQUEST_QUEUE.get(0).size(); i++) {
+      String person_type;
+      if (ELEVATOR_REQUEST_QUEUE.get(0).get(i).type)
+        person_type = "guest";
+      else
+        person_type = "employee";
+             
+      println("Person #" + i + " is a(n) " + person_type + " and is going to Floor " + ELEVATOR_REQUEST_QUEUE.get(0).get(i).dest);
+    }
   }
 }

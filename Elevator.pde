@@ -69,7 +69,7 @@ class Elevator {
       for (int i = 0; i < passengers.size(); i++) {
         if (location == passengers.get(i).dest) {
           if (location != 0)
-            //SCHEDULE_FLOOR_QUEUE(passengers.get(i), location);
+            SCHEDULE_FLOOR_QUEUE(passengers.get(i), location);
           passengers.remove(i);
         }
       }
@@ -78,7 +78,6 @@ class Elevator {
     // second, actually fill the elevator
     if (stopped == true) {
       for (int i = 0; passengers.size() < MAX_ELEVATOR_CAPACITY; i++) {
-        //Person newPassenger = new Person();//ELEVATOR_REQUEST_QUEUE[location][getDirection()].remove();
         println("Elevator #" + designation_num + " stopped at floor " + location);
         if (ELEVATOR_REQUEST_QUEUE.get(location).size() > 0) {
           Person p = ELEVATOR_REQUEST_QUEUE.get(location).remove(i);
@@ -90,12 +89,15 @@ class Elevator {
   }
   
   void SCHEDULE_FLOOR_QUEUE(final Person p, final int current_floor) {
+    final Controller c = new Controller();
+    /*
     final ScheduledThreadPoolExecutor queue_add = new ScheduledThreadPoolExecutor(1);
     queue_add.schedule (new Runnable () {
       @Override 
-      public void run() {
+      public void run() {*/
         ELEVATOR_REQUEST_QUEUE.get(current_floor).add(p);
+        c.request_elevator(current_floor, getDirection());/*
       }  
-    }, p.idle_time, TimeUnit.MILLISECONDS);
+    }, p.idle_time, TimeUnit.MILLISECONDS);*/
   }
 }
