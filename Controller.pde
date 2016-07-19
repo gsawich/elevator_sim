@@ -24,7 +24,7 @@ class Controller {
         }
       }
     }
-    if (!bank[bestEle].future_event.contains(floor)) // is button pressed?
+    if (floor > 0 && !bank[bestEle].future_event.contains(floor))
       bank[bestEle].future_event.add(floor);
   }
   
@@ -37,6 +37,16 @@ class Controller {
     
     for (Elevator e:bank) {
       e.move();
+      if (__DEBUG__) {
+        print("Future-Event-List for Elevator #" + e.designation_num + " is: ");
+        if (e.future_event.isEmpty())
+          print("EMPTY");
+        else {
+          for (int i = 0; i < e.future_event.size(); i++) 
+            print(e.future_event.get(i) + " ");
+        }
+        _DEBUG(" ");
+      }
     }
     
     _DEBUG("Call to inc() completed");

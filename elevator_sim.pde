@@ -72,15 +72,13 @@ void generate_people() {
       guest_count++;
     else
       emp_count++;
-    
-    final Controller c = new Controller();
     /*
     final ScheduledThreadPoolExecutor queue_add = new ScheduledThreadPoolExecutor(1);
     queue_add.schedule (new Runnable () {
       @Override 
       public void run() {*/
         ELEVATOR_REQUEST_QUEUE.get(0).add(p);
-        c.request_elevator(0, 1); // request an upward elevator
+        cont.request_elevator(0, 1); // request an upward elevator
         /*
       }  
     }, 10000, TimeUnit.MILLISECONDS);*/
