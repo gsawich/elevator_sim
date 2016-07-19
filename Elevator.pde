@@ -17,9 +17,6 @@ class Elevator {
     speed = 1;
     stopTime = 5;
     designation_num = 0;
-    future_event.add(floor(random(MAX_FLOORS)));
-    future_event.add(floor(random(MAX_FLOORS)));
-    future_event.add(floor(random(MAX_FLOORS)));
   }
   
   int getDirection() {
@@ -57,8 +54,8 @@ class Elevator {
     }
     else if (stopTime == 0){
       stopped = false;
-      future_event.add(floor(random(MAX_FLOORS)));
-      getDirection();
+      //future_event.add(floor(random(MAX_FLOORS)));
+      //getDirection();
       stopTime = 5;
     }
   }
