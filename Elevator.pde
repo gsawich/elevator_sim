@@ -5,7 +5,7 @@ class Elevator {
   boolean stopped;
   int stopTime;
   int designation_num;
-  Vector<Person> passengers = new Vector<Person>(MAX_ELEVATOR_CAPACITY + 1);
+  Vector<Person> passengers = new Vector<Person>(MAX_ELEVATOR_CAPACITY);
   LinkedList<Integer> future_event = new LinkedList<Integer>();
   int speed;
   
@@ -72,28 +72,14 @@ class Elevator {
     if (passengers.size() > 0) {
       _DEBUG("Elevator #" + designation_num + " :: fill_elevator() started step 1");
       for (int i = 0; i < passengers.size(); i++) {
-        _DEBUG("      :: fill_elevator():1 -> 1");
         if (location == passengers.get(i).dest) {
-           _DEBUG("      :: fill_elevator():1 -> 2");
           if (location > 0) {
-            _DEBUG("      :: fill_elevator():1 -> 3");
             SCHEDULE_FLOOR_QUEUE(passengers.get(i), location);
           }
           for (int j = 0; j < future_event.size(); j++) {
-            _DEBUG("      :: fill_elevator():1 -> 4");
             if (passengers.get(i).dest == future_event.get(j)) {
-              _DEBUG("   !    " + future_event.get(j) + " removed from Elevator #" + designation_num);
+              _DEBUG("   !!!    " + future_event.get(j) + " removed from Elevator #" + designation_num);
               future_event.remove(j); 
-              if (__DEBUG__) {
-                print("Future-Event-List for Elevator #" + designation_num + " is: ");
-                if (future_event.isEmpty())
-                  print("EMPTY");
-                else {
-                  for (int k = 0; i < future_event.size(); i++) 
-                    print(future_event.get(k) + " ");
-                }
-                _DEBUG(" ");
-              }
             }
           }
           passengers.remove(i);
@@ -104,9 +90,9 @@ class Elevator {
     // second, actually fill the elevator
     if (stopped == true) {
       _DEBUG("Elevator #" + designation_num + " :: fill_elevator() started step 2");
+      _DEBUG("Elevator #" + designation_num + " stopped at floor " + location);
       if (passengers.size() < 9) {
         for (int i = 0; i < 9; i++) {
-          _DEBUG("Elevator #" + designation_num + " stopped at floor " + location);
           if (ELEVATOR_REQUEST_QUEUE.get(location).size() > 0 && passengers.size() < MAX_ELEVATOR_CAPACITY) {
             Person p = ELEVATOR_REQUEST_QUEUE.get(location).remove(0);
             passengers.add(p);
@@ -120,16 +106,23 @@ class Elevator {
   }
   
   void SCHEDULE_FLOOR_QUEUE(final Person p, final int current_floor) {
-    /*
+    // Determine if next destination is non-zero
+    if (p.single_trip)
+      p.dest = 0;
+    else {
+      if (System.currentTimeMillis() - START_TIME <= DAY_LENGTH)
+        p.dest = floor(random(MAX_FLOORS) + 1);
+      else
+        p.dest = 0;
+    }
     final ScheduledThreadPoolExecutor queue_add = new ScheduledThreadPoolExecutor(1);
     queue_add.schedule (new Runnable () {
       @Override 
-      public void run() {*/
+      public void run() {
         ELEVATOR_REQUEST_QUEUE.get(current_floor).add(p);
         cont.request_elevator(current_floor, getDirection());
         _DEBUG("Person with destination " + p.dest + " has requested an elevator from floor " + current_floor);
-        /*
       }  
-    }, p.idle_time, TimeUnit.MILLISECONDS);*/
+    }, p.idle_time, TimeUnit.MILLISECONDS);
   }
 }

@@ -11,10 +11,11 @@ final boolean __DEBUG__ = true;
 // Global constants
 int MAX_ELEVATOR_CAPACITY = 9;
 int MAX_FLOORS = 30;
-int MAX_EMPLOYEES = 2;
+int MAX_EMPLOYEES = 60;
 int MAX_GUESTS = MAX_EMPLOYEES/2;
 int NUM_ELEVATORS = 3;
 long DAY_LENGTH = 90000; // 10 seconds per hour of simulation time
+long START_TIME = System.currentTimeMillis();
 double FPMRATIO = 0.2; // 5 frames per minute of simulation time (30fps)
 
 // Dynamic queue
@@ -68,18 +69,16 @@ void generate_people() {
   int guest_count = 0;
   while (emp_count < MAX_EMPLOYEES || guest_count < MAX_GUESTS) {
     final Person p = new Person();
-    if (p.type)
+    if (p.type && guest_count < MAX_GUESTS)
       guest_count++;
-    else
-      emp_count++;
-    /*
+    else if (!p.type && emp_count < MAX_EMPLOYEES)
+      emp_count++;/*
     final ScheduledThreadPoolExecutor queue_add = new ScheduledThreadPoolExecutor(1);
     queue_add.schedule (new Runnable () {
       @Override 
       public void run() {*/
         ELEVATOR_REQUEST_QUEUE.get(0).add(p);
-        cont.request_elevator(0, 1); // request an upward elevator
-        /*
+        cont.request_elevator(0, 1); /*// request an upward elevator
       }  
     }, 10000, TimeUnit.MILLISECONDS);*/
   }
