@@ -9,7 +9,7 @@ class Controller {
     }
   }
   
-  void request_elevator(int floor, int dir){
+  Elevator request_elevator(int floor, int dir){
     //Find a non-full elevator going in the right direction, then put the request in the future event list
     int bestDist = MAX_FLOORS; // Worst case
     int bestEle = 0;
@@ -28,6 +28,8 @@ class Controller {
       bank[bestEle].future_event.add(floor);
       Collections.sort(bank[bestEle].future_event);
     }
+    
+    return bank[bestEle];
   }
   
   Elevator getElevator(int i) {

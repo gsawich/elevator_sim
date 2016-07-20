@@ -8,6 +8,8 @@ class Person {
   Person() {
     floor = 0;
     dest = floor(random(MAX_FLOORS - 1)); // Person goes to a random floor
+    while (dest == 0)
+      dest = floor(random(MAX_FLOORS - 1));
     type = false;
     idle_time = 0;
     single_trip = false;

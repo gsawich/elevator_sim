@@ -11,7 +11,7 @@ class Elevator {
   ArrayList<Integer> future_event = new ArrayList<Integer>();
   
   Elevator() {
-    location = 0; //floor(random(MAX_FLOORS));
+    location = 0;
     direction = 0;
     stopped = true;
     full = false;
@@ -51,11 +51,6 @@ class Elevator {
       _DEBUG("Elevator #" + designation_num + " is moving");
       int dir = getDirection(); // -1 for down, 0 for stopped, 1 for up
       location += dir*speed;
-      /*
-      for (int i = 0; i < future_event.size(); i++) {
-        if (location == future_event.get(i))
-          stopped = true;
-      }*/
     }
     else if (stopped && stopTime > 0) {
       _DEBUG("Elevator #" + designation_num + " is stopped at floor " + location);
@@ -78,10 +73,10 @@ class Elevator {
       boolean fullfillment = false;
       _DEBUG("Elevator #" + designation_num + " :: fill_elevator() started step 1");
       for (int i = 0; i < passengers.size(); i++) {
-        _DEBUG("Elevator #" + designation_num + " :: " + " location = " + location + ", passengers.get(i).dest = " + passengers.get(i).dest);
         if (location == passengers.get(i).dest) {
           fullfillment = true;
-          SCHEDULE_FLOOR_QUEUE(passengers.get(i), location);
+          if (location > 0)
+            SCHEDULE_FLOOR_QUEUE(passengers.get(i), location);
           passengers.remove(i);
           future_event.remove(new Integer(location));
           Collections.sort(future_event);
@@ -89,26 +84,15 @@ class Elevator {
         }
       }
       if (!fullfillment) {
-        future_event.remove(new Integer(location)); // oh well
-        _DEBUG(" !!!! " + location + " removed from Elevator #" + designation_num + "'s event-list");
+        future_event.remove(new Integer(location)); // phantom button press, real-world-like
+        _DEBUG(" !p!p!p! " + location + " removed from Elevator #" + designation_num + "'s event-list");
       }
     }
     else if (passengers.isEmpty() && ELEVATOR_REQUEST_QUEUE.get(location).isEmpty()) {
       future_event.remove(new Integer(location));
-      _DEBUG(" !!!! " + location + " removed from Elevator #" + designation_num + "'s event-list");
+      _DEBUG(" !p!p!p! " + location + " removed from Elevator #" + designation_num + "'s event-list");
     }
-    
-    if (__DEBUG__) {
-      print("Person-Destination-List for ERQ" + location + " is: ");
-      if (ELEVATOR_REQUEST_QUEUE.get(location).isEmpty())
-        print("EMPTY");
-      else {
-        for (int i = 0; i < ELEVATOR_REQUEST_QUEUE.get(location).size(); i++) 
-          print(ELEVATOR_REQUEST_QUEUE.get(location).get(i).dest + " ");
-      }  
-      _DEBUG(" ");
-    }
-    
+        
     // second, actually fill the elevator
     if (stopped == true) {
       _DEBUG("Elevator #" + designation_num + " :: fill_elevator() started step 2");
@@ -145,8 +129,20 @@ class Elevator {
       @Override 
       public void run() {
         ELEVATOR_REQUEST_QUEUE.get(current_floor).add(p);
-        cont.request_elevator(current_floor, getDirection());
-        _DEBUG("Person with destination " + p.dest + " has requested an elevator from floor " + current_floor);
+        Elevator temp = cont.request_elevator(current_floor, getDirection());
+        _DEBUG("Person with destination " + p.dest + " has requested Elevator #" + temp.designation_num + " from floor " + current_floor);
+        
+        // Print the Elevator-Request-Queue for floor(location)
+        if (__DEBUG__) {
+          print("Person-Destination-List for ERQ" + location + " is: ");
+          if (ELEVATOR_REQUEST_QUEUE.get(location).isEmpty())
+            print("EMPTY");
+          else {
+            for (int i = 0; i < ELEVATOR_REQUEST_QUEUE.get(location).size(); i++) 
+              print(ELEVATOR_REQUEST_QUEUE.get(location).get(i).dest + " ");
+          }  
+          _DEBUG(" ");
+        }
       }  
     }, p.idle_time, TimeUnit.MILLISECONDS);
   }
