@@ -46,6 +46,15 @@ class Controller {
             print(e.future_event.get(i) + " ");
         }
         _DEBUG(" ");
+        
+        print("Person-Destination-List for Elevator #" + e.designation_num + " is: ");
+        if (e.passengers.isEmpty())
+          print("EMPTY");
+        else {
+          for (int i = 0; i < e.passengers.size(); i++)
+            print(e.passengers.get(i).dest + " ");
+        }
+        _DEBUG(" ");
       }
     }
   }

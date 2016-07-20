@@ -8,8 +8,8 @@ final boolean __DEBUG__ = true;
 // Global constants
 int MAX_ELEVATOR_CAPACITY = 9;
 int MAX_FLOORS = 30;
-int MAX_EMPLOYEES = 6;
-int MAX_GUESTS = MAX_EMPLOYEES/2;
+int MAX_EMPLOYEES = 600;
+int MAX_GUESTS = MAX_EMPLOYEES / 2;
 int NUM_ELEVATORS = 3;
 long DAY_LENGTH = 90000; // 10 seconds per hour of simulation time
 long START_TIME = System.currentTimeMillis();
@@ -23,10 +23,10 @@ Controller cont;
 
 void setup() {
   size(300, 480);
-  frameRate(5 );
+  frameRate(5);
   cont = new Controller();
   rectMode(CENTER);
-  // Output debugging to txt file in case of infinite loops
+  // Output debugging to txt file for all output to be shown
   /*if (__DEBUG__) {
     try {
       PrintStream out = new PrintStream(new FileOutputStream("output.txt"));
@@ -56,7 +56,7 @@ void draw() {
     fill(255);
     rect(x, y, 20, 20);
     fill(0);
-    text(n, x, y);
+    text(n, x - 5, y + 3);
   }
 }
 
@@ -76,7 +76,7 @@ void generate_people() {
         ELEVATOR_REQUEST_QUEUE.get(0).add(p);
         cont.request_elevator(0, 1); // request an upward elevator
       }  
-    }, 10000, TimeUnit.MILLISECONDS);
+    }, floor(random(10000)), TimeUnit.MILLISECONDS);
   }
 }
 

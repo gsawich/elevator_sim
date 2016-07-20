@@ -7,7 +7,7 @@ class Elevator {
   boolean full;
   boolean stopped;
   
-  Vector<Person> passengers = new Vector<Person>(MAX_ELEVATOR_CAPACITY);
+  Vector<Person> passengers = new Vector<Person>(MAX_ELEVATOR_CAPACITY); // sort by person's detination attribute
   ArrayList<Integer> future_event = new ArrayList<Integer>();
   
   Elevator() {
@@ -51,11 +51,11 @@ class Elevator {
       _DEBUG("Elevator #" + designation_num + " is moving");
       int dir = getDirection(); // -1 for down, 0 for stopped, 1 for up
       location += dir*speed;
-      
+      /*
       for (int i = 0; i < future_event.size(); i++) {
         if (location == future_event.get(i))
           stopped = true;
-      }
+      }*/
     }
     else if (stopped && stopTime > 0) {
       _DEBUG("Elevator #" + designation_num + " is stopped at floor " + location);
@@ -75,9 +75,12 @@ class Elevator {
   void fill_elevator() {
     // first, process departing passengers  
     if (passengers.size() > 0) {
+      boolean fullfillment = false;
       _DEBUG("Elevator #" + designation_num + " :: fill_elevator() started step 1");
       for (int i = 0; i < passengers.size(); i++) {
+        _DEBUG("Elevator #" + designation_num + " :: " + " location = " + location + ", passengers.get(i).dest = " + passengers.get(i).dest);
         if (location == passengers.get(i).dest) {
+          fullfillment = true;
           SCHEDULE_FLOOR_QUEUE(passengers.get(i), location);
           passengers.remove(i);
           future_event.remove(new Integer(location));
@@ -85,6 +88,25 @@ class Elevator {
           _DEBUG(" !!!! " + location + " removed from Elevator #" + designation_num + "'s event-list");
         }
       }
+      if (!fullfillment) {
+        future_event.remove(new Integer(location)); // oh well
+        _DEBUG(" !!!! " + location + " removed from Elevator #" + designation_num + "'s event-list");
+      }
+    }
+    else if (passengers.isEmpty() && ELEVATOR_REQUEST_QUEUE.get(location).isEmpty()) {
+      future_event.remove(new Integer(location));
+      _DEBUG(" !!!! " + location + " removed from Elevator #" + designation_num + "'s event-list");
+    }
+    
+    if (__DEBUG__) {
+      print("Person-Destination-List for ERQ" + location + " is: ");
+      if (ELEVATOR_REQUEST_QUEUE.get(location).isEmpty())
+        print("EMPTY");
+      else {
+        for (int i = 0; i < ELEVATOR_REQUEST_QUEUE.get(location).size(); i++) 
+          print(ELEVATOR_REQUEST_QUEUE.get(location).get(i).dest + " ");
+      }  
+      _DEBUG(" ");
     }
     
     // second, actually fill the elevator
@@ -114,7 +136,7 @@ class Elevator {
       p.dest = 0;
     else {
       if (System.currentTimeMillis() - START_TIME <= DAY_LENGTH)
-        p.dest = floor(random(MAX_FLOORS) + 1);
+        p.dest = floor(random(MAX_FLOORS - 1));
       else
         p.dest = 0;
     }
