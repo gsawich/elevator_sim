@@ -24,8 +24,10 @@ class Controller {
         }
       }
     }
-    if (floor > 0 && !bank[bestEle].future_event.contains(floor))
+    if (floor > 0 && !bank[bestEle].future_event.contains(floor)) {
       bank[bestEle].future_event.add(floor);
+      Collections.sort(bank[bestEle].future_event);
+    }
   }
   
   Elevator getElevator(int i) {

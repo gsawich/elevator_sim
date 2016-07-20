@@ -1,9 +1,6 @@
-import java.util.Vector;
-import java.util.Stack;
-import java.util.List;
-import java.util.LinkedList;
-import java.util.concurrent.*;
+import java.util.*;
 import java.io.*;
+import java.util.concurrent.*;
 
 // Set debugging
 final boolean __DEBUG__ = true;
@@ -11,7 +8,7 @@ final boolean __DEBUG__ = true;
 // Global constants
 int MAX_ELEVATOR_CAPACITY = 9;
 int MAX_FLOORS = 30;
-int MAX_EMPLOYEES = 60;
+int MAX_EMPLOYEES = 6;
 int MAX_GUESTS = MAX_EMPLOYEES/2;
 int NUM_ELEVATORS = 3;
 long DAY_LENGTH = 90000; // 10 seconds per hour of simulation time
@@ -54,9 +51,8 @@ void draw() {
     int x = 50 + (i*100);
     int y = (height-15) - ((cont.getElevator(i).getLocation()) * fheight);
     int n = 0;
-    try {
-      n = cont.getElevator(i).future_event.peek();
-    } catch (NullPointerException e) { /* do nothing */ }
+    if (!cont.getElevator(i).future_event.isEmpty())
+      n = cont.getElevator(i).future_event.get(0);
     fill(255);
     rect(x, y, 20, 20);
     fill(0);
@@ -72,15 +68,15 @@ void generate_people() {
     if (p.type && guest_count < MAX_GUESTS)
       guest_count++;
     else if (!p.type && emp_count < MAX_EMPLOYEES)
-      emp_count++;/*
-    final ScheduledThreadPoolExecutor queue_add = new ScheduledThreadPoolExecutor(1);
+      emp_count++;
+    final ScheduledThreadPoolExecutor queue_add = new ScheduledThreadPoolExecutor(5);
     queue_add.schedule (new Runnable () {
       @Override 
-      public void run() {*/
+      public void run() {
         ELEVATOR_REQUEST_QUEUE.get(0).add(p);
-        cont.request_elevator(0, 1); /*// request an upward elevator
+        cont.request_elevator(0, 1); // request an upward elevator
       }  
-    }, 10000, TimeUnit.MILLISECONDS);*/
+    }, 10000, TimeUnit.MILLISECONDS);
   }
 }
 
@@ -91,7 +87,7 @@ void init_system() {
   generate_people();
  
   if (__DEBUG__) {
-    // Test for working 3D Vector
+    // Test for working 3D vector
     for (int i = 0; i < ELEVATOR_REQUEST_QUEUE.get(0).size(); i++) {
       String person_type;
       if (ELEVATOR_REQUEST_QUEUE.get(0).get(i).type)

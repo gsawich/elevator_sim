@@ -7,7 +7,7 @@ class Person {
   
   Person() {
     floor = 0;
-    dest = floor(random(MAX_FLOORS)); // Person goes to a random floor
+    dest = floor(random(MAX_FLOORS - 1)); // Person goes to a random floor
     type = false;
     idle_time = 0;
     single_trip = false;

@@ -1,13 +1,14 @@
 class Elevator {
   int location;
   int direction;
-  boolean full;
-  boolean stopped;
+  int speed;
   int stopTime;
   int designation_num;
+  boolean full;
+  boolean stopped;
+  
   Vector<Person> passengers = new Vector<Person>(MAX_ELEVATOR_CAPACITY);
-  LinkedList<Integer> future_event = new LinkedList<Integer>();
-  int speed;
+  ArrayList<Integer> future_event = new ArrayList<Integer>();
   
   Elevator() {
     location = 0; //floor(random(MAX_FLOORS));
@@ -23,8 +24,8 @@ class Elevator {
     if (future_event.isEmpty()) // direction is always up for an elevator at floor 0
       direction = 1;
     else {
-      if (location - future_event.peek() != 0)
-        direction = (future_event.peek() - location)/(abs(location-future_event.peek()));
+      if (location - future_event.get(0) != 0)
+        direction = (future_event.get(0) - location)/(abs(location-future_event.get(0)));
       else {
         direction = 0;
         stopped = true;
@@ -50,39 +51,38 @@ class Elevator {
       _DEBUG("Elevator #" + designation_num + " is moving");
       int dir = getDirection(); // -1 for down, 0 for stopped, 1 for up
       location += dir*speed;
+      
+      for (int i = 0; i < future_event.size(); i++) {
+        if (location == future_event.get(i))
+          stopped = true;
+      }
     }
     else if (stopped && stopTime > 0) {
-      _DEBUG("Elevator #" + designation_num + " is stopped");
+      _DEBUG("Elevator #" + designation_num + " is stopped at floor " + location);
       fill_elevator();
       if (stopTime > 0) 
         stopTime--;
     }
     else if (stopped && stopTime == 0){
       _DEBUG("Elevator #" + designation_num + " is closing its doors");
-      if (passengers.size() > 0)
+      if (future_event.size() > 0)
         stopped = false;
-      //future_event.add(floor(random(MAX_FLOORS)));
-      //getDirection();
+        
       stopTime = 5;
     }
   }
   
   void fill_elevator() {
-    // first, process departing passengers
+    // first, process departing passengers  
     if (passengers.size() > 0) {
       _DEBUG("Elevator #" + designation_num + " :: fill_elevator() started step 1");
       for (int i = 0; i < passengers.size(); i++) {
         if (location == passengers.get(i).dest) {
-          if (location > 0) {
-            SCHEDULE_FLOOR_QUEUE(passengers.get(i), location);
-          }
-          for (int j = 0; j < future_event.size(); j++) {
-            if (passengers.get(i).dest == future_event.get(j)) {
-              _DEBUG("   !!!    " + future_event.get(j) + " removed from Elevator #" + designation_num);
-              future_event.remove(j); 
-            }
-          }
+          SCHEDULE_FLOOR_QUEUE(passengers.get(i), location);
           passengers.remove(i);
+          future_event.remove(new Integer(location));
+          Collections.sort(future_event);
+          _DEBUG(" !!!! " + location + " removed from Elevator #" + designation_num + "'s event-list");
         }
       }
     }
@@ -90,18 +90,21 @@ class Elevator {
     // second, actually fill the elevator
     if (stopped == true) {
       _DEBUG("Elevator #" + designation_num + " :: fill_elevator() started step 2");
-      _DEBUG("Elevator #" + designation_num + " stopped at floor " + location);
       if (passengers.size() < 9) {
         for (int i = 0; i < 9; i++) {
           if (ELEVATOR_REQUEST_QUEUE.get(location).size() > 0 && passengers.size() < MAX_ELEVATOR_CAPACITY) {
             Person p = ELEVATOR_REQUEST_QUEUE.get(location).remove(0);
             passengers.add(p);
             _DEBUG("Person with destination " + passengers.get(i).dest + " loaded onto Elevator #" + designation_num);
-            if (!future_event.contains(p.dest))
-              future_event.add(p.dest); 
+            if (!future_event.contains(p.dest)) {
+              future_event.add(p.dest);
+              Collections.sort(future_event);
+            }
           }
         }
       }
+      if (stopTime == 0)
+        stopped = false;
     }
   }
   
@@ -115,7 +118,7 @@ class Elevator {
       else
         p.dest = 0;
     }
-    final ScheduledThreadPoolExecutor queue_add = new ScheduledThreadPoolExecutor(1);
+    final ScheduledThreadPoolExecutor queue_add = new ScheduledThreadPoolExecutor(5);
     queue_add.schedule (new Runnable () {
       @Override 
       public void run() {
