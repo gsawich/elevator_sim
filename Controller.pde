@@ -9,7 +9,7 @@ class Controller {
     }
   }
   
-  Elevator request_elevator(int floor, int dir){
+  public Elevator request_elevator(int floor, int dir){
     //Find a non-full elevator going in the right direction, then put the request in the future event list
     int bestDist = MAX_FLOORS; // Worst case
     int bestEle = 0;
@@ -26,17 +26,19 @@ class Controller {
     }
     if (floor > 0 && !bank[bestEle].future_event.contains(floor)) {
       bank[bestEle].future_event.add(floor);
-      Collections.sort(bank[bestEle].future_event);
+      if ((bank[bestEle].getDirection() == 1 && floor - bank[bestEle].location > 0) || 
+          (bank[bestEle].getDirection() == -1 && floor - bank[bestEle].location < 0))
+        Collections.sort(bank[bestEle].future_event);
     }
     
     return bank[bestEle]; // return-type added for debugging purposes only
   }
   
-  Elevator getElevator(int i) {
+  private Elevator getElevator(int i) {
     return bank[i];
   }
   
-  void inc() {
+  public void inc() {
     for (Elevator e:bank) {
       e.move();
       

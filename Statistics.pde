@@ -9,19 +9,19 @@ public class Statistics {
   */
   
   // Get the average wait-time for an elevator among all Persons during the simulation run time
-  void gather_wait_times() {}
+  public void gather_wait_times() {}
   
   // Get the average and maximum queue lengths for each floor and for the entire system
-  void gather_queue_lengths() {}
+  public void gather_queue_lengths() {}
   
   // Determine the usage statistics for each elevator
-  void gather_elevator_usage() {
+  public void gather_elevator_usage() {
     // debugging statements are a good pivot point for this
   }
   
   // Get the minimum, maximum, and average number of bodies in an elevator during simulation run time
-  void gather_body_count() {}
+  public void gather_body_count() {}
   
   // Get the average trip-length a.k.a the amount of time a person waits on the elevator while going to their destination
-  void gather_trip_length() {}
+  public void gather_trip_length() {}
 }

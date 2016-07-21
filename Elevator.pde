@@ -6,7 +6,7 @@ class Elevator {
   public int designation_num;
   public boolean full;
   public boolean stopped;
-  
+ 
   public Vector<Person> passengers = new Vector<Person>(MAX_ELEVATOR_CAPACITY); 
   public ArrayList<Integer> future_event = new ArrayList<Integer>(); // sorted by increasing destinations
   
@@ -20,7 +20,7 @@ class Elevator {
     designation_num = 0;
   }
   
-  int getDirection() {
+  public int getDirection() {
     if (future_event.isEmpty()) // direction is always up for an elevator at floor 0
       direction = 1;
     else {
@@ -34,7 +34,17 @@ class Elevator {
     return direction;
   }
   
-  boolean isFull() {
+  public int getPersonDirection(int p_dest) {
+    int p_dir = 0; // same values as elevator
+    if (p_dest - location > 0)
+      p_dir = 1;
+    else
+      p_dir = -1;
+      
+    return p_dir;
+  }
+  
+  public boolean isFull() {
     if (passengers.size() == MAX_ELEVATOR_CAPACITY)
       full = true;
     else
@@ -42,11 +52,11 @@ class Elevator {
     return full;
   }
   
-  int getLocation(){
+  public int getLocation(){
     return location;
   }
   
-  void move() {
+  public void move() {
     if (!stopped){
       _DEBUG("Elevator #" + designation_num + " is moving");
       
@@ -70,7 +80,7 @@ class Elevator {
     }
   }
   
-  void fill_elevator() {
+  public void fill_elevator() {
     // first, process departing passengers  
     if (passengers.size() > 0) {
       boolean fullfillment = false;
@@ -92,13 +102,13 @@ class Elevator {
       if (!fullfillment) {
         future_event.remove(new Integer(location)); // phantom button press, real-world-like
         
-        _DEBUG(" !p!p!p! " + location + " removed from Elevator #" + designation_num + "'s event-list");
+        _DEBUG(" !!!! " + location + " removed from Elevator #" + designation_num + "'s event-list");
       }
     }
     else if (passengers.isEmpty() && ELEVATOR_REQUEST_QUEUE.get(location).isEmpty()) {
       future_event.remove(new Integer(location));
       
-      _DEBUG(" !p!p!p! " + location + " removed from Elevator #" + designation_num + "'s event-list");
+      _DEBUG(" !!!! " + location + " removed from Elevator #" + designation_num + "'s event-list");
     }
         
     // second, actually fill the elevator
@@ -115,7 +125,9 @@ class Elevator {
             
             if (!future_event.contains(p.dest)) {
               future_event.add(p.dest);
-              Collections.sort(future_event);
+              if ((getDirection() == 1 && p.dest - location > 0) || 
+                  (getDirection() == -1 && p.dest - location < 0))
+                Collections.sort(future_event);
             }
           }
         }
@@ -125,7 +137,7 @@ class Elevator {
     }
   }
   
-  void SCHEDULE_FLOOR_QUEUE(final Person p, final int current_floor) {
+  public void SCHEDULE_FLOOR_QUEUE(final Person p, final int current_floor) {
     // Determine if next destination is non-zero
     if (p.single_trip)
       p.dest = 0;
@@ -140,7 +152,7 @@ class Elevator {
       @Override 
       public void run() {
         ELEVATOR_REQUEST_QUEUE.get(current_floor).add(p);
-        Elevator temp = cont.request_elevator(current_floor, getDirection());
+        Elevator temp = cont.request_elevator(current_floor, getPersonDirection(p.dest));
         _DEBUG("Person with destination " + p.dest + " has requested Elevator #" + temp.designation_num + " from floor " + current_floor);
         
         // Print the Elevator-Request-Queue for floor(location)

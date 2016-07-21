@@ -3,6 +3,7 @@ class Person {
   public int idle_time;
   public boolean single_trip;
   public boolean type;
+  public int designation_num = 0;
   
   Person() {
     dest = floor(random(MAX_FLOORS - 1)); // Person goes to a random floor
@@ -19,5 +20,11 @@ class Person {
     else {
       idle_time = floor(random((DAY_LENGTH - 1000) / 2));
     }
+    
+    inc_p_count();
+  }
+  
+  private void inc_p_count() {
+    __debug__p_count++;
   }
 }
