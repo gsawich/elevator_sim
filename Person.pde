@@ -1,12 +1,10 @@
 class Person {
-  int floor;
-  int dest;
-  int idle_time;
-  boolean single_trip;
-  boolean type;
+  public int dest;
+  public int idle_time;
+  public boolean single_trip;
+  public boolean type;
   
   Person() {
-    floor = 0;
     dest = floor(random(MAX_FLOORS - 1)); // Person goes to a random floor
     while (dest == 0)
       dest = floor(random(MAX_FLOORS - 1));

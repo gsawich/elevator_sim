@@ -3,29 +3,37 @@ import java.io.*;
 import java.util.concurrent.*;
 
 // Set debugging
-final boolean __DEBUG__ = false;
+final boolean __DEBUG__ = true;
 
 // Global constants
-int MAX_ELEVATOR_CAPACITY = 9;
-int MAX_FLOORS = 30;
-int MAX_EMPLOYEES = 60;
-int MAX_GUESTS = MAX_EMPLOYEES / 2;
-int NUM_ELEVATORS = 3;
-long DAY_LENGTH = 90000; // 10 seconds per hour of simulation time
-long START_TIME = System.currentTimeMillis();
-double FPMRATIO = 0.2; // 5 frames per minute of simulation time (30fps)
+public final int MAX_ELEVATOR_CAPACITY = 9;
+public final int MAX_FLOORS = 30;
+public final int MAX_EMPLOYEES = 60;
+public final int MAX_GUESTS = MAX_EMPLOYEES / 2;
+public final int NUM_ELEVATORS = 3;
+public final long DAY_LENGTH = 90000; // 10 seconds per hour of simulation time
+public final long START_TIME = System.currentTimeMillis();
+
+// Required for non-multithreaded frequency-based people generation
+private int emp_count = 0;
+private int guest_count = 0;
+private float refresh_counter = 1;
+private boolean _continue = false;
+
+// Graphics
+public double FPMRATIO = 0.2; // 5 frames per minute of simulation time (30fps)
 
 // Dynamic queue
-Vector<Vector<Person>> ELEVATOR_REQUEST_QUEUE = new Vector(MAX_FLOORS);
+public Vector<Vector<Person>> ELEVATOR_REQUEST_QUEUE = new Vector(MAX_FLOORS);
 
 //Processing Sketch Functions
-Controller cont;
+public final Controller cont = new Controller();
 
 void setup() {
   size(300, 480);
   frameRate(5);
-  cont = new Controller();
   rectMode(CENTER);
+  
   // Output debugging to txt file for all output to be shown
   /*if (__DEBUG__) {
     try {
@@ -33,6 +41,7 @@ void setup() {
       System.setOut(out);
     } catch (FileNotFoundException e) { /* do nothing *//* } 
   }*/
+  
   init_system();
 }
 
@@ -40,6 +49,7 @@ void draw() {
   clear();
   colorMode(RGB, 255);
   background(80, 0, 250);
+  generate_people();
   cont.inc();
   int fheight = (height-15)/MAX_FLOORS;
   for (int i = 0; i < MAX_FLOORS+1; i++){
@@ -56,21 +66,20 @@ void draw() {
     fill(255);
     rect(x, y, 20, 20);
     fill(0);
-    text(n, x - 5, y + 3);
+    text(n, x - 5, y + 3); // if n = 0, in_use = false
   }
   
-  long sim_time = System.currentTimeMillis() - START_TIME;
-  println("Current simulation time is: " + sim_time);
+  // if debugging mode is off, simulation time will be shown
+  if (!__DEBUG__) {
+    long sim_time = System.currentTimeMillis() - START_TIME;
+    println("Current simulation time is: " + sim_time);
+  }
 }
 
 void generate_people() {
   ArrayList<Float> freq = arrival_frequencies(); 
   // freq[0] = emp_freq, freq[1] = guest_freq
   // freq[2] = distribution_of_arrival, freq[3] = refresh_interval
-  int emp_count = 0;
-  int guest_count = 0;
-  float refresh_counter = 1;
-  boolean _continue = false;
     
   if (System.currentTimeMillis() - START_TIME <= DAY_LENGTH) {
     while (emp_count < MAX_EMPLOYEES * freq.get(0) || guest_count < MAX_GUESTS * freq.get(1)) {
@@ -107,11 +116,11 @@ void generate_people() {
 }
 
 ArrayList<Float> arrival_frequencies() {
-  /* =================== ARRIVAL FREQUENCY CHART ===================== *
+  /* ================ CURRENT ARRIVAL FREQUENCY CHART ================ *
    * 8am - 9am  (0ms to 10000ms)     = 75% of employees, 15% of guests *
    * 9am - 11am (10000ms to 30000ms) = 25% of employees, 40% of guests *
    * 11am - 1pm (30000ms to 50000ms) = 0% of employees,  30% of guests *
-   * 1pm - 5pm  (50000ms - 90000ms)  = 0% of employees,  15% of guests */
+   * 1pm - 5pm  (50000ms to 90000ms)  = 0% of employees,  15% of guests */
    
   ArrayList<Float> arrival_frequencies = new ArrayList<Float>(4);
   float emp_frequency = 0;
@@ -155,13 +164,9 @@ ArrayList<Float> arrival_frequencies() {
 void init_system() {
   for (int i = 0; i < MAX_FLOORS; i++)
     ELEVATOR_REQUEST_QUEUE.add(new Stack<Person>());
-    
-  //thread("generate_people");
   
-  generate_people();
- 
+ // Test for working 3D vector
   if (__DEBUG__) {
-    // Test for working 3D vector
     for (int i = 0; i < ELEVATOR_REQUEST_QUEUE.get(0).size(); i++) {
       String person_type;
       if (ELEVATOR_REQUEST_QUEUE.get(0).get(i).type)

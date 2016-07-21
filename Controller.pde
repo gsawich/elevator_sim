@@ -1,5 +1,5 @@
 class Controller {
-  Elevator[] bank;
+  private Elevator[] bank;
   
   Controller() {
     bank = new Elevator[NUM_ELEVATORS];
@@ -29,7 +29,7 @@ class Controller {
       Collections.sort(bank[bestEle].future_event);
     }
     
-    return bank[bestEle];
+    return bank[bestEle]; // return-type added for debugging purposes only
   }
   
   Elevator getElevator(int i) {
@@ -39,6 +39,8 @@ class Controller {
   void inc() {
     for (Elevator e:bank) {
       e.move();
+      
+      // Debugging future_event and person-destination lists
       if (__DEBUG__) {
         print("Future-Event-List for Elevator #" + e.designation_num + " is: ");
         if (e.future_event.isEmpty())

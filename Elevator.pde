@@ -1,14 +1,14 @@
 class Elevator {
-  int location;
-  int direction;
-  int speed;
-  int stopTime;
-  int designation_num;
-  boolean full;
-  boolean stopped;
+  public int location;
+  public int direction;
+  public int speed;
+  public int stopTime;
+  public int designation_num;
+  public boolean full;
+  public boolean stopped;
   
-  Vector<Person> passengers = new Vector<Person>(MAX_ELEVATOR_CAPACITY); // sort by person's detination attribute
-  ArrayList<Integer> future_event = new ArrayList<Integer>();
+  public Vector<Person> passengers = new Vector<Person>(MAX_ELEVATOR_CAPACITY); 
+  public ArrayList<Integer> future_event = new ArrayList<Integer>(); // sorted by increasing destinations
   
   Elevator() {
     location = 0;
@@ -49,17 +49,20 @@ class Elevator {
   void move() {
     if (!stopped){
       _DEBUG("Elevator #" + designation_num + " is moving");
+      
       int dir = getDirection(); // -1 for down, 0 for stopped, 1 for up
       location += dir*speed;
     }
     else if (stopped && stopTime > 0) {
       _DEBUG("Elevator #" + designation_num + " is stopped at floor " + location);
+      
       fill_elevator();
       if (stopTime > 0) 
         stopTime--;
     }
     else if (stopped && stopTime == 0){
       _DEBUG("Elevator #" + designation_num + " is closing its doors");
+      
       if (future_event.size() > 0)
         stopped = false;
         
@@ -71,7 +74,9 @@ class Elevator {
     // first, process departing passengers  
     if (passengers.size() > 0) {
       boolean fullfillment = false;
+      
       _DEBUG("Elevator #" + designation_num + " :: fill_elevator() started step 1");
+      
       for (int i = 0; i < passengers.size(); i++) {
         if (location == passengers.get(i).dest) {
           fullfillment = true;
@@ -80,28 +85,34 @@ class Elevator {
           passengers.remove(i);
           future_event.remove(new Integer(location));
           Collections.sort(future_event);
+          
           _DEBUG(" !!!! " + location + " removed from Elevator #" + designation_num + "'s event-list");
         }
       }
       if (!fullfillment) {
         future_event.remove(new Integer(location)); // phantom button press, real-world-like
+        
         _DEBUG(" !p!p!p! " + location + " removed from Elevator #" + designation_num + "'s event-list");
       }
     }
     else if (passengers.isEmpty() && ELEVATOR_REQUEST_QUEUE.get(location).isEmpty()) {
       future_event.remove(new Integer(location));
+      
       _DEBUG(" !p!p!p! " + location + " removed from Elevator #" + designation_num + "'s event-list");
     }
         
     // second, actually fill the elevator
     if (stopped == true) {
       _DEBUG("Elevator #" + designation_num + " :: fill_elevator() started step 2");
+      
       if (passengers.size() < 9) {
         for (int i = 0; i < 9; i++) {
           if (ELEVATOR_REQUEST_QUEUE.get(location).size() > 0 && passengers.size() < MAX_ELEVATOR_CAPACITY) {
             Person p = ELEVATOR_REQUEST_QUEUE.get(location).remove(0);
             passengers.add(p);
+            
             _DEBUG("Person with destination " + passengers.get(i).dest + " loaded onto Elevator #" + designation_num);
+            
             if (!future_event.contains(p.dest)) {
               future_event.add(p.dest);
               Collections.sort(future_event);
