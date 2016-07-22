@@ -4,6 +4,7 @@ class Elevator {
   public int speed;
   public int stopTime;
   public int designation_num;
+  public boolean sort_reverse;
   public boolean full;
   public boolean stopped;
  
@@ -15,6 +16,7 @@ class Elevator {
     direction = 0;
     stopped = true;
     full = false;
+    sort_reverse = false;
     speed = 1;
     stopTime = 5;
     designation_num = 0;
@@ -126,8 +128,15 @@ class Elevator {
             if (!future_event.contains(p.dest)) {
               future_event.add(p.dest);
               if ((getDirection() == 1 && p.dest - location > 0) || 
-                  (getDirection() == -1 && p.dest - location < 0))
+                  (getDirection() == -1 && p.dest - location < 0)) {
                 Collections.sort(future_event);
+                
+                if (getDirection() == -1 && !sort_reverse)
+                  Collections.reverse(future_event);
+                  
+                if (getDirection() == 1 && sort_reverse)
+                  sort_reverse = false;
+              }
             }
           }
         }

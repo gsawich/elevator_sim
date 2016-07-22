@@ -25,10 +25,21 @@ class Controller {
       }
     }
     if (floor > 0 && !bank[bestEle].future_event.contains(floor)) {
-      bank[bestEle].future_event.add(floor);
-      if ((bank[bestEle].getDirection() == 1 && floor - bank[bestEle].location > 0) || 
-          (bank[bestEle].getDirection() == -1 && floor - bank[bestEle].location < 0))
-        Collections.sort(bank[bestEle].future_event);
+      if (!bank[bestEle].future_event.contains(floor)) {
+              bank[bestEle].future_event.add(floor);
+              if ((bank[bestEle].getDirection() == 1 && floor - bank[bestEle].location > 0) || 
+                  (bank[bestEle].getDirection() == -1 && floor - bank[bestEle].location < 0)) {
+                Collections.sort(bank[bestEle].future_event);   
+                
+                if (bank[bestEle].getDirection() == -1 && !bank[bestEle].sort_reverse) {
+                  Collections.reverse(bank[bestEle].future_event);
+                  bank[bestEle].sort_reverse = true;
+                  
+                if (bank[bestEle].getDirection() == 1 && bank[bestEle].sort_reverse)
+                  bank[bestEle].sort_reverse = false;
+                }
+              }
+            }
     }
     
     return bank[bestEle]; // return-type added for debugging purposes only
@@ -40,6 +51,9 @@ class Controller {
   
   public void inc() {
     for (Elevator e:bank) {
+     /* if (e.future_event)
+        Collections.sort(e.future_event);*/
+        
       e.move();
       
       // Debugging future_event and person-destination lists
@@ -61,6 +75,19 @@ class Controller {
             print(e.passengers.get(i).dest + " ");
         }
         _DEBUG(" ");
+      }
+    }
+    
+    if (_DEBUG_QUEUE_STATUS_VIEW_) {
+      for (int i = 0; i < ELEVATOR_REQUEST_QUEUE.size(); i++) {
+          print("Person-Destination-List for ERQ" + i + " is: ");
+          if (ELEVATOR_REQUEST_QUEUE.get(i).isEmpty())
+            print("EMPTY");
+          else {
+            for (int j = 0; j < ELEVATOR_REQUEST_QUEUE.get(i).size(); j++)
+              print(ELEVATOR_REQUEST_QUEUE.get(i).get(j).dest + " ");
+          }
+          println(" ");
       }
     }
   }

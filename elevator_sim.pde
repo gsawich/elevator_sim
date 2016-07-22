@@ -3,8 +3,9 @@ import java.io.*;
 import java.util.concurrent.*;
 
 // Set debugging
-public static final boolean __DEBUG__ = true;
-private static final boolean __DEBUGING_TO_FILE__ = true;
+public static final boolean __DEBUG__ = false;
+public static final boolean _DEBUG_QUEUE_STATUS_VIEW_ = true;
+private static final boolean __DEBUGING_TO_FILE__ = false;
 private static int __debug__p_count;
 
 // Global constants
@@ -76,11 +77,11 @@ public void draw() {
     text(n, x - 5, y + 3); // if n = 0, in_use = false
   }
   
-  // if debugging mode is off, simulation time will be shown
-  if (!__DEBUG__) {
+  // if debugging mode is off, simulation time will be shown 
+  /*if (!__DEBUG__) {
     long sim_time = System.currentTimeMillis() - START_TIME;
     println("Current simulation time is: " + sim_time);
-  }
+  }*/
 }
 
 private void generate_people() {
@@ -96,7 +97,7 @@ private void generate_people() {
         freq = arrival_frequencies();
               
         if (refresh_counter != freq.get(2)) {
-          _DEBUG("$$#$#$#$#$#$#$#$ refresh counter updated");
+          _DEBUG("           ->  FREQUENCY REFRESH COUTNER UPDATED");
           refresh_counter = freq.get(2);
           emp_count = 0;
           guest_count = 0;
