@@ -37,7 +37,7 @@ public Statistics STATS = new Statistics();
 public static final double FPMRATIO = 0.2; // 5 frames per minute of simulation time (30fps)
 
 public void setup() {
-  size(300, 480);
+  size(480, 480);
   frameRate(5);
   rectMode(CENTER);
   __debug__p_count = 0;
@@ -67,21 +67,46 @@ public void draw() {
   
   // draw graphics
   int fheight = (height-15)/MAX_FLOORS;
-  for (int i = 0; i < MAX_FLOORS+1; i++){
-    int fy = 15 + (i*fheight);
+  for (int i = 0; i < MAX_FLOORS; i++){
+    int fy = height - (15 + (i*fheight));
     fill(100);
-    rect(150, fy, 280, fheight);
+    rect(width/2, fy, width-20, fheight);
+    fill(255);
+    textAlign(RIGHT);
+    text(i+1, width-12, fy+4);
+    for (int j = 0; j < ELEVATOR_REQUEST_QUEUE.get(i).size(); j++) {
+      Person p = ELEVATOR_REQUEST_QUEUE.get(i).get(j);
+      if (!p.type) {
+        fill(200, 0, 0);
+      }
+      else {
+        fill(0, 0, 200);
+      }
+      rect((width-180)-(j*6), fy, 3, 3);
+    }
   }
   for (int i = 0; i < NUM_ELEVATORS; i++){
-    int x = 50 + (i*100);
+    int x = (width-((NUM_ELEVATORS+1)*40)) + (i*40);
     int y = (height-15) - ((cont.getElevator(i).getLocation()) * fheight);
     int n = 0;
+    int p = cont.getElevator(i).getPassengers();
+    boolean[] passType = cont.getElevator(i).getPassType();
     if (!cont.getElevator(i).future_event.isEmpty())
-      n = cont.getElevator(i).future_event.get(0);
+      n = cont.getElevator(i).future_event.get(0) + 1;
     fill(255);
     rect(x, y, 20, 20);
     fill(0);
-    text(n, x - 5, y + 3); // if n = 0, in_use = false
+    textAlign(CENTER);
+    text(n, x, y - 13); // if n = 0, in_use = false
+    for (int j = 0; j < p; j++) {
+      if (!passType[j]) {
+        fill(200, 0, 0);
+      }
+      else {
+        fill(0, 0, 200);
+      }
+      rect((x-6) + ((j%3)*6), (y-6) + ((j/3)*6), 3, 3);
+    }
   }
     
   // if debugging mode is off, simulation time will be shown 
