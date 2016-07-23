@@ -4,7 +4,7 @@ import java.util.concurrent.*;
 
 // Set debugging
 public static final boolean __DEBUG__ = false;
-public static final boolean _DEBUG_QUEUE_STATUS_VIEW_ = true;
+public static final boolean _DEBUG_QUEUE_STATUS_VIEW_ = false;
 private static final boolean __DEBUGING_TO_FILE__ = false;
 private static int __debug__p_count;
 
@@ -41,6 +41,7 @@ public void setup() {
   frameRate(5);
   rectMode(CENTER);
   __debug__p_count = 0;
+  
   for (int i = 0; i < MAX_FLOORS; i++)
     ELEVATOR_REQUEST_QUEUE.add(new Stack<Person>()); 
   
@@ -54,11 +55,17 @@ public void setup() {
 }
 
 public void draw() {
+  // initialize data collection
   clear();
   colorMode(RGB, 255);
   background(80, 0, 250);
+  
+  // get data
   generate_people();
   cont.inc();
+  STATS.gather_queue_lengths();
+  
+  // draw graphics
   int fheight = (height-15)/MAX_FLOORS;
   for (int i = 0; i < MAX_FLOORS+1; i++){
     int fy = 15 + (i*fheight);
@@ -76,12 +83,19 @@ public void draw() {
     fill(0);
     text(n, x - 5, y + 3); // if n = 0, in_use = false
   }
-  
+    
   // if debugging mode is off, simulation time will be shown 
-  /*if (!__DEBUG__) {
+  if (!__DEBUG__) {
     long sim_time = System.currentTimeMillis() - START_TIME;
     println("Current simulation time is: " + sim_time);
-  }*/
+  }
+  
+  // Stop simulation and run statistics report at DAY_LENGTH
+  if (System.currentTimeMillis() - START_TIME >= DAY_LENGTH) {
+    noLoop();
+    println("\n\n\n");
+    STATS.generate_report();
+  }
 }
 
 private void generate_people() {
