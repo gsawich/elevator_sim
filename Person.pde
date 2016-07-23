@@ -5,11 +5,13 @@ class Person {
   public boolean type;
   public int designation_num;
   public float queue_arrival_time;
+  public float trip_start_time;
   
   Person() {
     designation_num = 0;
     idle_time = 0;
     queue_arrival_time = 0;
+    trip_start_time = 0;
     type = false;
     single_trip = false;
     
@@ -27,9 +29,7 @@ class Person {
     
     inc_p_count();
   }
-  
-  
-  
+    
   private void inc_p_count() {
     __debug__p_count++;
   }
