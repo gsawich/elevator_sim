@@ -89,7 +89,9 @@ class Elevator {
       
       if (future_event.size() > 0)
         stopped = false;
-        
+      else
+        future_event.add(new Integer(0));
+
       stopTime = 5;
     }
   }
@@ -121,7 +123,6 @@ class Elevator {
     }
     else if (passengers.isEmpty() && ELEVATOR_REQUEST_QUEUE.get(location).isEmpty()) {
       future_event.remove(new Integer(location));
-      future_event.add(new Integer(0));
       _DEBUG(" !!!! " + location + " removed from Elevator #" + designation_num + "'s event-list");
     }
         

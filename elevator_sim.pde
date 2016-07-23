@@ -96,13 +96,18 @@ public void draw() {
     int n = 0;
     int p = cont.getElevator(i).getPassengers();
     boolean[] passType = cont.getElevator(i).getPassType();
-    if (!cont.getElevator(i).future_event.isEmpty())
-      n = cont.getElevator(i).future_event.get(0) + 1;
+
     fill(255);
     rect(x, y, 20, 20);
-    fill(0);
-    textAlign(CENTER);
-    text(n, x, y - 13); // if n = 0, in_use = false
+    
+    if (!cont.getElevator(i).future_event.isEmpty()) {
+      for (int k = 0; k < cont.getElevator(i).future_event.size(); k++) { 
+        n = cont.getElevator(i).future_event.get(k) + 1;
+        fill(0);
+        textAlign(CENTER);
+        text(n, x, (y - 13)-(k*8)); // if n = 0, in_use = false
+      }
+    }
     for (int j = 0; j < p; j++) {
       if (!passType[j]) {
         fill(200, 0, 0);
