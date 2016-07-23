@@ -110,7 +110,7 @@ public class Statistics {
   }
   
   private String[] gen_arr(String msg, ArrayList<Float> l) {
-    String [] x = new String[l.size()];
+    String[] x = new String[l.size()];
     for (int i = 0; i < l.size(); i++)
       x[i] = msg + i + ": " + l.get(i);
 
