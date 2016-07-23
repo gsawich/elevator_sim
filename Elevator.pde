@@ -134,6 +134,8 @@ class Elevator {
         for (int i = 0; i < 9; i++) {
           if (ELEVATOR_REQUEST_QUEUE.get(location).size() > 0 && passengers.size() < MAX_ELEVATOR_CAPACITY) {
             Person p = ELEVATOR_REQUEST_QUEUE.get(location).remove(0);
+            STATS.gather_wait_times(p.queue_arrival_time);
+            p.queue_arrival_time = 0;
             passengers.add(p);
             
             _DEBUG("Person with destination " + passengers.get(i).dest + " loaded onto Elevator #" + designation_num);
@@ -160,10 +162,7 @@ class Elevator {
     }
   }
   
-  public void SCHEDULE_FLOOR_QUEUE(final Person p, final int current_floor) {
-    // Record wait time statistics
-    STATS.gather_wait_times(p.queue_arrival_time);
-    
+  public void SCHEDULE_FLOOR_QUEUE(final Person p, final int current_floor) {   
     // Determine if next destination is non-zero
     if (p.single_trip)
       p.dest = 0;

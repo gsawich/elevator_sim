@@ -119,10 +119,6 @@ public void draw() {
     }
   }
     
-  // if debugging mode is off, simulation time will be shown 
-  if (!__DEBUG__)
-    println("Current simulation time is: " + current_sim_time());
-
   // Stop simulation and run statistics report after DAY_LENGTH when everyone has left the building
   boolean queues_free = true;
   for (Vector v:ELEVATOR_REQUEST_QUEUE) {
@@ -187,7 +183,7 @@ private void generate_people() {
               _DEBUG("*** Person #" + p.designation_num + " is a(n) " + person_type + " and is going to Floor " + p.dest);
               }
             }
-          }, floor(random(50)), TimeUnit.MILLISECONDS);
+          }, floor(random(10000)), TimeUnit.MILLISECONDS);
         }
         
         _continue = false;

@@ -2,14 +2,14 @@ public class Statistics {
   // This class must facilitate the gathering of the following statistics:
   private int STAT0; // Average wait-time for an elevator among all Persons in a given day (simulation run time)
   private int STAT1; // Average and maximum queue lengths for each floor and for the entire system
-  private int STAT2; // Elevator usage statistics relating to how the elevators are used during the busiest and slowest times of the day
-  private int STAT3; // Maximum, minimum and average number of bodies in an elevator overall and at peak times
-  private int STAT4; // Average trip-length for all persons as they ride the elevator to and from their destination(s)
+  private int STAT2; // Maximum and average number of bodies in an elevator overall and at peak times
+  private int STAT3; // Average trip-length for all persons as they ride the elevator to and from their destination(s)
   
   private ArrayList<Integer> call_count;
   private ArrayList<Float> QUEUE_LENGTH_AVG;
   private ArrayList<Float> QUEUE_LENGTH_MAX;
-  private ArrayList<Integer> ELEVATOR_AVG_CAPACITY;
+  private ArrayList<Float> ELEVATOR_AVG_CAPACITY;
+  private ArrayList<Integer> ELEVATOR_MAX_CAPACITY;
   private float PERSON_WAIT_TIME;
   private float MAX_WAIT_TIME;
     
@@ -18,24 +18,26 @@ public class Statistics {
     STAT1 = 0;
     STAT2 = 0;
     STAT3 = 0;
-    STAT4 = 0;
     
     call_count = new ArrayList<Integer>();
     QUEUE_LENGTH_AVG = new ArrayList<Float>();
     QUEUE_LENGTH_MAX = new ArrayList<Float>();
-    ELEVATOR_AVG_CAPACITY = new ArrayList<Integer>();
+    ELEVATOR_AVG_CAPACITY = new ArrayList<Float>();
+    ELEVATOR_MAX_CAPACITY = new ArrayList<Integer>();
     PERSON_WAIT_TIME = 0.0;
     MAX_WAIT_TIME = 0.0;
     
     // Change default ArrayList values from "null" to "0"
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < 4; i++)
       call_count.add(0); 
     for (int i = 0; i < MAX_FLOORS; i++) {
       QUEUE_LENGTH_AVG.add(0.0);
       QUEUE_LENGTH_MAX.add(0.0);
     }
-    for (int i = 0; i < NUM_ELEVATORS; i++)
-      ELEVATOR_AVG_CAPACITY.add(0);
+    for (int i = 0; i < NUM_ELEVATORS; i++) {
+      ELEVATOR_AVG_CAPACITY.add(0.0);
+      ELEVATOR_MAX_CAPACITY.add(0);
+    }
   }
   
   // Get the average wait-time for an elevator among all Persons during the simulation run time
@@ -60,14 +62,19 @@ public class Statistics {
         QUEUE_LENGTH_MAX.set(i, next_stat);
     }
   }
-  
-  // Determine the usage statistics for each elevator
-  public void gather_elevator_usage() {
     
-  }
-  
   // Get the minimum, maximum, and average number of bodies in an elevator during simulation run time
-  public void gather_body_count() {}
+  public void gather_elevator_capacity() {
+    call_count.set(STAT2, call_count.get(STAT2) + 1);
+    for (int i = 0; i < cont.bank.length; i++) {
+      int next_stat = cont.bank[i].getPassengers();
+      float current_size = (ELEVATOR_AVG_CAPACITY.get(i) * (call_count.get(STAT2) - 1)) + next_stat;
+      ELEVATOR_AVG_CAPACITY.set(i, current_size / call_count.get(STAT2));
+    
+      if (next_stat > ELEVATOR_MAX_CAPACITY.get(i))
+        ELEVATOR_MAX_CAPACITY.set(i, next_stat);
+    }
+  }
   
   // Get the average trip-length a.k.a the amount of time a person waits on the elevator while going to their destination
   public void gather_trip_length() {}
@@ -99,9 +106,15 @@ public class Statistics {
     String stat_1 = "  Queue Lengths";
     String stat_1_0 = "Overall average queue length: " + mean(QUEUE_LENGTH_AVG);
     String stat_1_1 = "Overall maximum queue length: " + Collections.max(QUEUE_LENGTH_MAX) + 
-                      " (on floor " + QUEUE_LENGTH_MAX.indexOf(Collections.max(QUEUE_LENGTH_MAX)) + ")";
+                      " (on Floor " + QUEUE_LENGTH_MAX.indexOf(Collections.max(QUEUE_LENGTH_MAX)) + ")";
     String[] stat_1_2 = gen_arr("Average queue length for Floor ", QUEUE_LENGTH_AVG);
     String[] stat_1_3 = gen_arr("Maximum queue length for Floor ", QUEUE_LENGTH_MAX);
+    String stat_2 = "  Elevator Capacities  ";
+    String stat_2_0 = "Overall average elevator capacity: " + mean(ELEVATOR_AVG_CAPACITY);
+    String stat_2_1 = "Overall maximum elevator capacity: " + Collections.max(ELEVATOR_MAX_CAPACITY) + 
+                      " (on Elevator " + ELEVATOR_MAX_CAPACITY.indexOf(Collections.max(ELEVATOR_MAX_CAPACITY)) + ")";
+    String[] stat_2_2 = gen_arr("Average capacity for Elevator #", ELEVATOR_AVG_CAPACITY);
+    String[] stat_2_3 = gen_int_arr("Maximum capacity for Elevator #", ELEVATOR_MAX_CAPACITY);
     
     // Report Header
     print(report_header);
@@ -121,6 +134,16 @@ public class Statistics {
       println(f0 + a);
     for (String b : stat_1_3)
       println(f0 + b);
+      
+    // Header: Elevator Capacities
+    print(section_header_a + stat_2 + section_header_b);
+    
+    // Data: Elevator Capacities
+    print(f0 + stat_2_0 + _newline_ + f0 + stat_2_1 + _newline_ + f5 + f0 + f4 + _newline_);
+    for (String c : stat_2_2)
+      println(f0 + c);
+    for (String d : stat_2_3)
+      println(f0 + d);
   }
   
   // Helper method(s) for the Statistics class  
@@ -138,6 +161,14 @@ public class Statistics {
   }
   
   private String[] gen_arr(String msg, ArrayList<Float> l) {
+    String[] x = new String[l.size()];
+    for (int i = 0; i < l.size(); i++)
+      x[i] = msg + i + ": " + l.get(i);
+
+    return x;
+  }
+  
+  private String[] gen_int_arr(String msg, ArrayList<Integer> l) {
     String[] x = new String[l.size()];
     for (int i = 0; i < l.size(); i++)
       x[i] = msg + i + ": " + l.get(i);
