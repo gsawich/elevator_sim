@@ -9,7 +9,9 @@ public class Statistics {
   private ArrayList<Integer> call_count;
   private ArrayList<Float> QUEUE_LENGTH_AVG;
   private ArrayList<Float> QUEUE_LENGTH_MAX;
+  private ArrayList<Integer> ELEVATOR_AVG_CAPACITY;
   private float PERSON_WAIT_TIME;
+  private float MAX_WAIT_TIME;
     
   Statistics() {
     STAT0 = 0;
@@ -21,7 +23,9 @@ public class Statistics {
     call_count = new ArrayList<Integer>();
     QUEUE_LENGTH_AVG = new ArrayList<Float>();
     QUEUE_LENGTH_MAX = new ArrayList<Float>();
+    ELEVATOR_AVG_CAPACITY = new ArrayList<Integer>();
     PERSON_WAIT_TIME = 0.0;
+    MAX_WAIT_TIME = 0.0;
     
     // Change default ArrayList values from "null" to "0"
     for (int i = 0; i < 5; i++)
@@ -30,12 +34,18 @@ public class Statistics {
       QUEUE_LENGTH_AVG.add(0.0);
       QUEUE_LENGTH_MAX.add(0.0);
     }
+    for (int i = 0; i < NUM_ELEVATORS; i++)
+      ELEVATOR_AVG_CAPACITY.add(0);
   }
   
   // Get the average wait-time for an elevator among all Persons during the simulation run time
   public void gather_wait_times(float queue_arrival) {
+    float new_time = current_sim_time() - queue_arrival;
     call_count.set(STAT0, call_count.get(STAT0) + 1);
-    PERSON_WAIT_TIME += current_sim_time() - queue_arrival;
+    PERSON_WAIT_TIME += new_time;
+    
+    if (new_time > MAX_WAIT_TIME)
+      MAX_WAIT_TIME = new_time;
   }
   
   // Get the average and maximum queue lengths for each floor and for the entire system
@@ -53,7 +63,7 @@ public class Statistics {
   
   // Determine the usage statistics for each elevator
   public void gather_elevator_usage() {
-    // debugging statements are a good pivot point for this
+    
   }
   
   // Get the minimum, maximum, and average number of bodies in an elevator during simulation run time
@@ -85,6 +95,7 @@ public class Statistics {
 
     String stat_0 = "  Wait Times   ";
     String stat_0_0 = "Average wait time for an elevator was: " + get_real_time(PERSON_WAIT_TIME / call_count.get(STAT0));
+    String stat_0_1 = "Maximum wait time for an elevator was: " + get_real_time(MAX_WAIT_TIME);
     String stat_1 = "  Queue Lengths";
     String stat_1_0 = "Overall average queue length: " + mean(QUEUE_LENGTH_AVG);
     String stat_1_1 = "Overall maximum queue length: " + Collections.max(QUEUE_LENGTH_MAX) + 
@@ -99,7 +110,7 @@ public class Statistics {
     print(section_header_a + stat_0 + section_header_b);
     
     // Data: Wait Times
-    print(f0 + stat_0_0);
+    print(f0 + stat_0_0 + _newline_ + f0 + stat_0_1);
     
     // Header: Queue Lengths
     print(section_header_a + stat_1 + section_header_b);
