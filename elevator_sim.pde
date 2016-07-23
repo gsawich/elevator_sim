@@ -86,6 +86,8 @@ public void draw() {
       else {
         fill(0, 0, 200);
       }
+      textAlign(CENTER);
+      text(p.dest+1, (width-180)-(j*6), fy+4);
       rect((width-180)-(j*6), fy, 3, 3);
     }
   }
