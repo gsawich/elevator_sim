@@ -173,7 +173,7 @@ private void generate_people() {
               _DEBUG("*** Person #" + p.designation_num + " is a(n) " + person_type + " and is going to Floor " + p.dest);
               }
             }
-          }, floor(random(50)), TimeUnit.MILLISECONDS);
+          }, floor(random(10000)), TimeUnit.MILLISECONDS);
         }
         
         _continue = false;

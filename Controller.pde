@@ -1,5 +1,5 @@
 class Controller {
-  private Elevator[] bank;
+  public Elevator[] bank;
   
   Controller() {
     bank = new Elevator[NUM_ELEVATORS];
@@ -55,6 +55,7 @@ class Controller {
         Collections.sort(e.future_event);*/
         
       e.move();
+      STATS.gather_elevator_capacity();
       
       // Debugging future_event and person-destination lists
       if (__DEBUG__) {
