@@ -1,42 +1,50 @@
 public class Statistics {
-  /*
-  This class must facilitate the gathering of the following statistics:
-    1. Average wait-time for an elevator among all Persons in a given day (simulation run time)
-    2. Average and maximum queue lengths for each floor and for the entire system
-    3. Elevator usage statistics relating to how the elevators are used during the busiest and slowest times of the day
-    4. Maximum, minimum and average number of bodies in an elevator overall and at peak times
-    5. Average trip-length for all persons as they ride the elevator to and from their destination(s)
-  */
+  // This class must facilitate the gathering of the following statistics:
+  private int STAT0; // Average wait-time for an elevator among all Persons in a given day (simulation run time)
+  private int STAT1; // Average and maximum queue lengths for each floor and for the entire system
+  private int STAT2; // Elevator usage statistics relating to how the elevators are used during the busiest and slowest times of the day
+  private int STAT3; // Maximum, minimum and average number of bodies in an elevator overall and at peak times
+  private int STAT4; // Average trip-length for all persons as they ride the elevator to and from their destination(s)
   
-  private float call_count;
+  private ArrayList<Integer> call_count;
   private ArrayList<Float> QUEUE_LENGTH_AVG;
   private ArrayList<Float> QUEUE_LENGTH_MAX;
-  private int SINGLE_QUEUE_MAX;
+  private float PERSON_WAIT_TIME;
     
   Statistics() {
-    call_count = 0.0;
+    STAT0 = 0;
+    STAT1 = 0;
+    STAT2 = 0;
+    STAT3 = 0;
+    STAT4 = 0;
+    
+    call_count = new ArrayList<Integer>();
     QUEUE_LENGTH_AVG = new ArrayList<Float>();
     QUEUE_LENGTH_MAX = new ArrayList<Float>();
+    PERSON_WAIT_TIME = 0.0;
     
     // Change default ArrayList values from "null" to "0"
+    for (int i = 0; i < 5; i++)
+      call_count.add(0); 
     for (int i = 0; i < MAX_FLOORS; i++) {
       QUEUE_LENGTH_AVG.add(0.0);
       QUEUE_LENGTH_MAX.add(0.0);
     }
-    
-    SINGLE_QUEUE_MAX = 0;
   }
   
   // Get the average wait-time for an elevator among all Persons during the simulation run time
-  public void gather_wait_times() {}
+  public void gather_wait_times(float queue_arrival) {
+    call_count.set(STAT0, call_count.get(STAT0) + 1);
+    PERSON_WAIT_TIME += current_sim_time() - queue_arrival;
+  }
   
   // Get the average and maximum queue lengths for each floor and for the entire system
   public void gather_queue_lengths() {
-    call_count++;
+    call_count.set(STAT1, call_count.get(STAT1) + 1);
     for (int i = 0; i < MAX_FLOORS; i++) {
       float next_stat = ELEVATOR_REQUEST_QUEUE.get(i).size();
-      float current_size = (QUEUE_LENGTH_AVG.get(i) * (call_count - 1)) + next_stat;
-      QUEUE_LENGTH_AVG.set(i, current_size / call_count);
+      float current_size = (QUEUE_LENGTH_AVG.get(i) * (call_count.get(STAT1) - 1)) + next_stat;
+      QUEUE_LENGTH_AVG.set(i, current_size / call_count.get(STAT1));
       
       if (next_stat > QUEUE_LENGTH_MAX.get(i))
         QUEUE_LENGTH_MAX.set(i, next_stat);
@@ -75,6 +83,8 @@ public class Statistics {
     String section_header_a = _newline_ + _newline_ + f5 + f3 + _newline_ + f0 + f5;
     String section_header_b = _newline_ + f5 + f3 + _newline_ + _newline_;
 
+    String stat_0 = "  Wait Times   ";
+    String stat_0_0 = "Average wait time for an elevator was: " + get_real_time(PERSON_WAIT_TIME / call_count.get(STAT0));
     String stat_1 = "  Queue Lengths";
     String stat_1_0 = "Overall average queue length: " + mean(QUEUE_LENGTH_AVG);
     String stat_1_1 = "Overall maximum queue length: " + Collections.max(QUEUE_LENGTH_MAX) + 
@@ -84,6 +94,12 @@ public class Statistics {
     
     // Report Header
     print(report_header);
+    
+    // Header: Wait Times
+    print(section_header_a + stat_0 + section_header_b);
+    
+    // Data: Wait Times
+    print(f0 + stat_0_0);
     
     // Header: Queue Lengths
     print(section_header_a + stat_1 + section_header_b);
@@ -96,10 +112,11 @@ public class Statistics {
       println(f0 + b);
   }
   
-  // Helper method(s) for the Statistics class
-  /*private float seconds_elapsed() {
-    return (System.currentTimeMillis() - START_TIME) / 1000;
-  }*/
+  // Helper method(s) for the Statistics class  
+  private String get_real_time(float ms_time) {
+    float x = (ms_time / 2.77) / 60;
+    return x + " minutes";
+  }
   
   private float mean(ArrayList<Float> l) {
     float sub_mean = 0.0;

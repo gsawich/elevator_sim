@@ -92,7 +92,7 @@ class Elevator {
       for (int i = 0; i < passengers.size(); i++) {
         if (location == passengers.get(i).dest) {
           fullfillment = true;
-          if (location > 0)
+          if (location > 0) 
             SCHEDULE_FLOOR_QUEUE(passengers.get(i), location);
           passengers.remove(i);
           future_event.remove(new Integer(location));
@@ -147,12 +147,17 @@ class Elevator {
   }
   
   public void SCHEDULE_FLOOR_QUEUE(final Person p, final int current_floor) {
+    // Record wait time statistics
+    STATS.gather_wait_times(p.queue_arrival_time);
+    
     // Determine if next destination is non-zero
     if (p.single_trip)
       p.dest = 0;
     else {
-      if (System.currentTimeMillis() - START_TIME <= DAY_LENGTH)
+      if (current_sim_time() <= DAY_LENGTH) {
         p.dest = floor(random(MAX_FLOORS - 1));
+        p.queue_arrival_time = 0;
+      }
       else
         p.dest = 0;
     }
@@ -161,6 +166,7 @@ class Elevator {
       @Override 
       public void run() {
         ELEVATOR_REQUEST_QUEUE.get(current_floor).add(p);
+        p.queue_arrival_time = current_sim_time();
         Elevator temp = cont.request_elevator(current_floor, getPersonDirection(p.dest));
         _DEBUG("Person with destination " + p.dest + " has requested Elevator #" + temp.designation_num + " from floor " + current_floor);
         

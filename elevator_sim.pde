@@ -85,13 +85,12 @@ public void draw() {
   }
     
   // if debugging mode is off, simulation time will be shown 
-  if (!__DEBUG__) {
-    long sim_time = System.currentTimeMillis() - START_TIME;
-    println("Current simulation time is: " + sim_time);
-  }
+  if (!__DEBUG__)
+    println("Current simulation time is: " + current_sim_time());
+
   
   // Stop simulation and run statistics report at DAY_LENGTH
-  if (System.currentTimeMillis() - START_TIME >= DAY_LENGTH) {
+  if (current_sim_time()>= DAY_LENGTH) {
     noLoop();
     println("\n\n\n");
     STATS.generate_report();
@@ -104,7 +103,7 @@ private void generate_people() {
   
   if (refresh_counter != freq.get(2) && !isGenerating) {
     isGenerating = true;
-    if (System.currentTimeMillis() - START_TIME <= DAY_LENGTH) {
+    if (current_sim_time() <= DAY_LENGTH) {
       while ((float) emp_count < (float) MAX_EMPLOYEES * freq.get(0) || 
              (float) guest_count < (float) MAX_GUESTS * freq.get(1)) {
         final Person p = new Person();
@@ -137,6 +136,7 @@ private void generate_people() {
             public void run() {
               ELEVATOR_REQUEST_QUEUE.get(0).add(p);
               cont.request_elevator(0, 1); // request an upward elevator
+              p.queue_arrival_time = current_sim_time();
               
               if (__DEBUG__) {
                 String person_type;
@@ -146,7 +146,7 @@ private void generate_people() {
                   person_type = "employee";
               _DEBUG("*** Person #" + p.designation_num + " is a(n) " + person_type + " and is going to Floor " + p.dest);
               }
-            }  
+            }
           }, floor(random(50)), TimeUnit.MILLISECONDS);
         }
         
@@ -169,24 +169,23 @@ private ArrayList<Float> arrival_frequencies() {
   float emp_frequency = 0;
   float guest_frequency = 0;
   int refresh_interval = 0; // lets generate_people to clear its counters when a new frequency becomes valid
-  long current_time = System.currentTimeMillis() - START_TIME;
   
-  if (current_time < 10000) {
+  if (current_sim_time() < 10000) {
     emp_frequency = 0.75;
     guest_frequency = 0.15;
     refresh_interval = 1;
   }
-  else if (current_time >= 10000 && current_time < 30000) {
+  else if (current_sim_time() >= 10000 && current_sim_time() < 30000) {
     emp_frequency = 0.25;
     guest_frequency = 0.40;
     refresh_interval = 2;
   }
-  else if (current_time >= 30000 && current_time < 50000) {
+  else if (current_sim_time() >= 30000 && current_sim_time() < 50000) {
     emp_frequency = 0.0;
     guest_frequency = 0.30;
     refresh_interval = 3;
   }
-  else if (current_time >= 50000 && current_time < 90000) {
+  else if (current_sim_time() >= 50000 && current_sim_time() < 90000) {
     emp_frequency = 0.0;
     guest_frequency = 0.15;
     refresh_interval = 4;
@@ -196,6 +195,10 @@ private ArrayList<Float> arrival_frequencies() {
   arrival_frequencies.add(guest_frequency);
   arrival_frequencies.add((float) refresh_interval);
   return arrival_frequencies;
+}
+
+public float current_sim_time() {
+   return System.currentTimeMillis() - START_TIME;
 }
 
 public void _DEBUG(String debug_msg) {
