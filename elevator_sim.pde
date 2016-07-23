@@ -9,6 +9,7 @@ private static final boolean __DEBUGING_TO_FILE__ = false;
 private static int __debug__p_count;
 
 // Global constants
+public static final int FRAME_RATE = 30;
 public static final int MAX_ELEVATOR_CAPACITY = 9;
 public static final int MAX_FLOORS = 30;
 public static final int MAX_EMPLOYEES = 60;
@@ -38,7 +39,7 @@ public static final double FPMRATIO = 0.2; // 5 frames per minute of simulation 
 
 public void setup() {
   size(480, 480);
-  frameRate(5);
+  frameRate(FRAME_RATE);
   rectMode(CENTER);
   __debug__p_count = 0;
   
