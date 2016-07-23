@@ -58,6 +58,18 @@ class Elevator {
     return location;
   }
   
+  public int getPassengers(){
+    return passengers.size();
+  }
+  
+  public boolean[] getPassType(){
+   boolean[] passType = new boolean[passengers.size()];
+   for (int i = 0; i < passengers.size(); i ++){
+     passType[i] = passengers.get(i).type; 
+   }
+   return passType;
+  }
+  
   public void move() {
     if (!stopped){
       _DEBUG("Elevator #" + designation_num + " is moving");
@@ -109,7 +121,7 @@ class Elevator {
     }
     else if (passengers.isEmpty() && ELEVATOR_REQUEST_QUEUE.get(location).isEmpty()) {
       future_event.remove(new Integer(location));
-      
+      future_event.add(new Integer(0));
       _DEBUG(" !!!! " + location + " removed from Elevator #" + designation_num + "'s event-list");
     }
         

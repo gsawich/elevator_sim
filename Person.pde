@@ -28,6 +28,8 @@ class Person {
     inc_p_count();
   }
   
+  
+  
   private void inc_p_count() {
     __debug__p_count++;
   }
