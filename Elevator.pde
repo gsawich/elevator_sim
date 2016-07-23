@@ -155,8 +155,9 @@ class Elevator {
           }
         }
       }
-      if (stopTime == 0)
+      if (stopTime == 0) {
         stopped = false;
+      }
     }
   }
   
@@ -167,6 +168,7 @@ class Elevator {
     else {
       if (current_sim_time() < DAY_LENGTH) {
         p.dest = floor(random(MAX_FLOORS - 1));
+        p.idle_time = floor(random(DAY_LENGTH - current_sim_time()));
         p.queue_arrival_time = 0;
       }
       else

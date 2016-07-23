@@ -17,6 +17,7 @@ public static final int MAX_GUESTS = MAX_EMPLOYEES + (MAX_EMPLOYEES / 3);
 public static final int NUM_ELEVATORS = 3;
 public static final long DAY_LENGTH = 90000; // 10 seconds per hour of simulation time
 public static final long START_TIME = System.currentTimeMillis();
+public static final float TIME_RATIO = (DAY_LENGTH/9)/3600; // 2.77 ms per second of sim time
 
 // Required for non-multithreaded frequency-based people generation
 private static int emp_count = 0;
@@ -35,8 +36,6 @@ public Controller cont = new Controller();
 public Statistics STATS = new Statistics();
 
 // Graphics
-public static final double FPMRATIO = 0.2; // 5 frames per minute of simulation time (30fps)
-
 public void setup() {
   size(480, 480);
   frameRate(FRAME_RATE);
@@ -67,6 +66,10 @@ public void draw() {
   STATS.gather_queue_lengths();
   
   // draw graphics
+  textAlign(LEFT);
+  fill(0);
+  text(current_sim_clock(), 5, 16);
+  // draw floors
   int fheight = (height-15)/MAX_FLOORS;
   for (int i = 0; i < MAX_FLOORS; i++){
     int fy = height - (15 + (i*fheight));
@@ -86,6 +89,7 @@ public void draw() {
       rect((width-180)-(j*6), fy, 3, 3);
     }
   }
+  // draw elevators
   for (int i = 0; i < NUM_ELEVATORS; i++){
     int x = (width-((NUM_ELEVATORS+1)*40)) + (i*40);
     int y = (height-15) - ((cont.getElevator(i).getLocation()) * fheight);
@@ -114,9 +118,14 @@ public void draw() {
   if (!__DEBUG__)
     println("Current simulation time is: " + current_sim_time());
 
-  
-  // Stop simulation and run statistics report at DAY_LENGTH
-  if (current_sim_time()>= DAY_LENGTH) {
+  // Stop simulation and run statistics report after DAY_LENGTH when everyone has left the building
+  boolean queues_free = true;
+  for (Vector v:ELEVATOR_REQUEST_QUEUE) {
+    if (v.size() > 0) {
+      queues_free = false;
+    }
+  }
+  if (current_sim_time()>= DAY_LENGTH && queues_free) {
     noLoop();
     println("\n\n\n");
     STATS.generate_report();
@@ -225,6 +234,14 @@ private ArrayList<Float> arrival_frequencies() {
 
 public float current_sim_time() {
    return System.currentTimeMillis() - START_TIME;
+}
+
+public String current_sim_clock() {
+   float time = current_sim_time();
+   int hours = floor(floor(time/TIME_RATIO)/3600);
+   int minutes = floor(floor(time/TIME_RATIO)/60)%60;
+   int seconds = floor(time/TIME_RATIO)%60;
+   return "" + (hours + 8) + ":" + minutes + ":" + seconds;
 }
 
 public void _DEBUG(String debug_msg) {
