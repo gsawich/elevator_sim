@@ -38,10 +38,8 @@ public class Statistics {
       float current_size = (QUEUE_LENGTH_AVG.get(i) * (call_count - 1)) + next_stat;
       QUEUE_LENGTH_AVG.set(i, current_size / call_count);
       
-      if (next_stat > QUEUE_LENGTH_MAX.get(i)) {
+      if (next_stat > QUEUE_LENGTH_MAX.get(i))
         QUEUE_LENGTH_MAX.set(i, next_stat);
-        SINGLE_QUEUE_MAX = i;
-      }
     }
   }
   
@@ -58,24 +56,40 @@ public class Statistics {
   
   // Generate a report of the final statistics collected throughout the simulation run-time
   public void generate_report() {
-    String f0 = new String(new char[22]).replace("\0", " ");
-    String f1 = new String(new char[23]).replace("\0", "+=");
-    String f2 = new String(new char[7]).replace("\0", "+=");
-    String f3 = new String(new char[83]).replace("\0", "-");
-    String f4 = new String(new char[5]).replace("\0", ".");
-    String f5 = new String(new char[10]).replace("\0", " ");
-    String f6 = "RESULTS (ANALYSIS)";
+    String _str_build_ = "\0";
+    String _newline_ = "\n";
+    String report_style = "+=";
+    String section_style = "-";
+    String section_break_style = ".";
+    String space = " ";
+    
+    String f0 = new String(new char[25]).replace(_str_build_, space);
+    String f1 = new String(new char[24]).replace(_str_build_, report_style);
+    String f2 = new String(new char[7]).replace(_str_build_, report_style);
+    String f3 = new String(new char[70]).replace(_str_build_, section_style);
+    String f4 = new String(new char[20]).replace(_str_build_, section_break_style);
+    String f5 = new String(new char[15]).replace(_str_build_, space);
+    
+    String report_title = " RESULTS (ANALYSIS) ";
+    String report_header = f0 + f1 + _newline_ + f0 + f2 + report_title + f2 + _newline_ + f0 + f1;
+    String section_header_a = _newline_ + _newline_ + f5 + f3 + _newline_ + f0 + f5;
+    String section_header_b = _newline_ + f5 + f3 + _newline_ + _newline_;
+
+    String stat_1 = "  Queue Lengths";
     String stat_1_0 = "Overall average queue length: " + mean(QUEUE_LENGTH_AVG);
     String stat_1_1 = "Overall maximum queue length: " + Collections.max(QUEUE_LENGTH_MAX) + 
-                      " (on floor " + SINGLE_QUEUE_MAX + ")";
+                      " (on floor " + QUEUE_LENGTH_MAX.indexOf(Collections.max(QUEUE_LENGTH_MAX)) + ")";
     String[] stat_1_2 = gen_arr("Average queue length for Floor ", QUEUE_LENGTH_AVG);
     String[] stat_1_3 = gen_arr("Maximum queue length for Floor ", QUEUE_LENGTH_MAX);
     
-    // Report header
-    print(f0 + f1 + "\n" + f0 + f2 + f6 + f2 + "\n" + f0 + f1 + "\n\n" + f3 + "\n\n");
+    // Report Header
+    print(report_header);
     
-    // Report data
-    print(f0 + stat_1_0 + "\n" + stat_1_1 + "\n" + f5 + f4 + "\n");
+    // Header: Queue Lengths
+    print(section_header_a + stat_1 + section_header_b);
+    
+    // Data: Queue Lengths 
+    print(f0 + stat_1_0 + _newline_ + f0 + stat_1_1 + _newline_ + f5 + f0 + f4 + _newline_);
     for (String a : stat_1_2)
       println(f0 + a);
     for (String b : stat_1_3)
