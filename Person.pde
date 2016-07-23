@@ -19,10 +19,10 @@ class Person {
     if (random(2) > 1) type = true; // Either false for employee, true for guest
     if (!type) {
       if (random(2) > 1) single_trip = true; // Employees may go to a different floor
-      idle_time = floor(random(DAY_LENGTH - 1000));
+      idle_time = floor(random(DAY_LENGTH - current_sim_time()));
     }
     else {
-      idle_time = floor(random((DAY_LENGTH - 1000) / 2));
+      idle_time = floor(random((DAY_LENGTH - current_sim_time()) / 2));
     }
     
     inc_p_count();
