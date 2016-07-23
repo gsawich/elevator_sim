@@ -114,10 +114,6 @@ public void draw() {
     }
   }
     
-  // if debugging mode is off, simulation time will be shown 
-  if (!__DEBUG__)
-    println("Current simulation time is: " + current_sim_time());
-
   // Stop simulation and run statistics report after DAY_LENGTH when everyone has left the building
   boolean queues_free = true;
   for (Vector v:ELEVATOR_REQUEST_QUEUE) {
