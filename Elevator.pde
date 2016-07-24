@@ -126,8 +126,8 @@ class Elevator {
     if (stopped == true) {
       _DEBUG("Elevator #" + designation_num + " :: fill_elevator() started step 2");
       
-      for (int i = 0; i < ELEVATOR_REQUEST_QUEUE.get(location).size(); i++) {
-        if (ELEVATOR_REQUEST_QUEUE.get(location).size() > 0) {
+      if (ELEVATOR_REQUEST_QUEUE.get(location).size() > 0) {
+        for (int i = 0; i < ELEVATOR_REQUEST_QUEUE.get(location).size(); i++) {
           Person p = ELEVATOR_REQUEST_QUEUE.get(location).get(i);
           if (passengers.size() < MAX_ELEVATOR_CAPACITY && (getPersonDirection(p, location)*direction) >= 0) {
             STATS.gather_wait_times(p.queue_arrival_time);
@@ -140,6 +140,9 @@ class Elevator {
               future_event.add(p.dest);
               sortEvents();
             }
+          }
+          else {
+            cont.request_elevator(location, getPersonDirection(p, location));
           }
         }
       }
@@ -177,6 +180,7 @@ class Elevator {
       }
       else {
         p.dest = 0;
+        p.single_trip = true;
         p.idle_time = floor(random(5000));
     }
     final ScheduledThreadPoolExecutor queue_add = new ScheduledThreadPoolExecutor(5);

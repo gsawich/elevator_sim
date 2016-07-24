@@ -14,7 +14,7 @@ class Controller {
     int bestDist = MAX_FLOORS; // Worst case
     int bestEle = 0;
     for (int i=0; i < NUM_ELEVATORS; i++) {
-      //if (!(bank[i].isFull())) { //ignore full elevators
+      if (!(bank[i].isFull())) { //ignore full elevators
       int eleDir = bank[i].getDirection();
         if ((eleDir*dir) <=0) { //if elevator is going in the right direction or stopped
           if ((bank[i].getLocation() - floor)*eleDir <= 0) {
@@ -25,7 +25,7 @@ class Controller {
           }
           }
         }
-      //}
+      }
     }
     if (!bank[bestEle].future_event.contains(floor)) {
         bank[bestEle].future_event.add(floor);
