@@ -16,7 +16,7 @@ class Controller {
     for (int i=0; i < NUM_ELEVATORS; i++) {
       //if (!(bank[i].isFull())) { //ignore full elevators
         if ((bank[i].getDirection()*dir) >=0) { //if elevator is going in the right direction or stopped
-          int dist = (bank[i].getLocation() - floor);
+          int dist = abs(bank[i].getLocation() - floor);
           if (dist < bestDist) {
             bestDist = dist;
             bestEle = i;
@@ -25,21 +25,8 @@ class Controller {
       //}
     }
     if (floor > 0 && !bank[bestEle].future_event.contains(floor)) {
-      if (!bank[bestEle].future_event.contains(floor)) {
         bank[bestEle].future_event.add(floor);
-        if ((bank[bestEle].getDirection() == 1 && floor - bank[bestEle].location > 0) || 
-            (bank[bestEle].getDirection() == -1 && floor - bank[bestEle].location < 0)) {
-          Collections.sort(bank[bestEle].future_event);   
-          
-          if (bank[bestEle].getDirection() == -1 && !bank[bestEle].sort_reverse) {
-            Collections.reverse(bank[bestEle].future_event);
-            bank[bestEle].sort_reverse = true;
-            
-          if (bank[bestEle].getDirection() == 1 && bank[bestEle].sort_reverse)
-            bank[bestEle].sort_reverse = false;
-          }
-        }
-      }
+        bank[bestEle].sortEvents();
     }
     
     return bank[bestEle]; // return-type added for debugging purposes only

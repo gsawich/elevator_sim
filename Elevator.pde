@@ -23,15 +23,14 @@ class Elevator {
   }
   
   public int getDirection() {
-    if (future_event.isEmpty()) // direction is always up for an elevator at floor 0
-      direction = 1;
+    int direction = 0;
+    //if (future_event.isEmpty()) // direction is always up for an elevator at floor 0
+    //  direction = 1;
+    if (location - future_event.get(0) != 0)
+      direction = (future_event.get(0) - location)/(abs(location-future_event.get(0)));
     else {
-      if (location - future_event.get(0) != 0)
-        direction = (future_event.get(0) - location)/(abs(location-future_event.get(0)));
-      else {
-        direction = 0;
-        stopped = true;
-      }
+      direction = 0;
+      stopped = true;
     }
     return direction;
   }
@@ -76,6 +75,7 @@ class Elevator {
       
       int dir = getDirection(); // -1 for down, 0 for stopped, 1 for up
       location += dir*speed;
+      sortEvents();
     }
     else if (stopped && stopTime > 0) {
       _DEBUG("Elevator #" + designation_num + " is stopped at floor " + location);
@@ -89,9 +89,10 @@ class Elevator {
       
       if (future_event.size() > 0)
         stopped = false;
-      else
+      else if (passengers.size() < 1) {
         future_event.add(new Integer(0));
-
+        sortEvents();
+      }
       stopTime = 5;
     }
   }
@@ -142,16 +143,7 @@ class Elevator {
             
             if (!future_event.contains(p.dest)) {
               future_event.add(p.dest);
-              if ((getDirection() == 1 && p.dest - location > 0) || 
-                  (getDirection() == -1 && p.dest - location < 0)) {
-                Collections.sort(future_event);
-                
-                if (getDirection() == -1 && !sort_reverse)
-                  Collections.reverse(future_event);
-                  
-                if (getDirection() == 1 && sort_reverse)
-                  sort_reverse = false;
-              }
+              sortEvents();
             }
           }
         }
@@ -160,6 +152,13 @@ class Elevator {
         stopped = false;
       }
     }
+  }
+  
+  public void sortEvents() {
+    int dir = getDirection();
+    Collections.sort(future_event);
+    if (dir == -1)
+      Collections.reverse(future_event);
   }
   
   public void SCHEDULE_FLOOR_QUEUE(final Person p, final int current_floor) {   
