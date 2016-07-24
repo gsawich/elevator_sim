@@ -35,13 +35,10 @@ class Elevator {
     return direction;
   }
   
-  public int getPersonDirection(int p_dest) {
-    int p_dir = 0; // same values as elevator
-    if (p_dest - location > 0)
-      p_dir = 1;
-    else
-      p_dir = -1;
-      
+  public int getPersonDirection(Person p, int loc) {
+    int p_dir = 0;
+    if ((p.dest - loc) != 0)
+      p_dir = (p.dest - loc)/(abs(loc-p.dest));
     return p_dir;
   }
   
@@ -75,7 +72,6 @@ class Elevator {
       
       int dir = getDirection(); // -1 for down, 0 for stopped, 1 for up
       location += dir*speed;
-      sortEvents();
     }
     else if (stopped && stopTime > 0) {
       _DEBUG("Elevator #" + designation_num + " is stopped at floor " + location);
@@ -91,7 +87,7 @@ class Elevator {
         stopped = false;
       else if (passengers.size() < 1) {
         future_event.add(new Integer(0));
-        sortEvents();
+        //sortEvents();
       }
       stopTime = 5;
     }
@@ -111,8 +107,7 @@ class Elevator {
             SCHEDULE_FLOOR_QUEUE(passengers.get(i), location);
           passengers.remove(i);
           future_event.remove(new Integer(location));
-          Collections.sort(future_event);
-          
+          sortEvents();          
           _DEBUG(" !!!! " + location + " removed from Elevator #" + designation_num + "'s event-list");
         }
       }
@@ -131,15 +126,15 @@ class Elevator {
     if (stopped == true) {
       _DEBUG("Elevator #" + designation_num + " :: fill_elevator() started step 2");
       
-      if (passengers.size() < 9) {
-        for (int i = 0; i < 9; i++) {
-          if (ELEVATOR_REQUEST_QUEUE.get(location).size() > 0 && passengers.size() < MAX_ELEVATOR_CAPACITY) {
-            Person p = ELEVATOR_REQUEST_QUEUE.get(location).remove(0);
+      if (ELEVATOR_REQUEST_QUEUE.get(location).size() > 0) {
+        for (int i = 0; i < ELEVATOR_REQUEST_QUEUE.get(location).size(); i++) {
+          Person p = ELEVATOR_REQUEST_QUEUE.get(location).get(i);
+          if (passengers.size() < MAX_ELEVATOR_CAPACITY && (getPersonDirection(p, location)*direction) >= 0) {
             STATS.gather_wait_times(p.queue_arrival_time);
             p.queue_arrival_time = 0;
             passengers.add(p);
-            
-            _DEBUG("Person with destination " + passengers.get(i).dest + " loaded onto Elevator #" + designation_num);
+            ELEVATOR_REQUEST_QUEUE.get(location).remove(p);
+            _DEBUG("Person with destination " + p.dest + " loaded onto Elevator #" + designation_num);
             
             if (!future_event.contains(p.dest)) {
               future_event.add(p.dest);
@@ -167,6 +162,7 @@ class Elevator {
       p.dest = 0;
     else {
       if (current_sim_time() < DAY_LENGTH) {
+        while (p.dest != current_floor)
         p.dest = floor(random(MAX_FLOORS - 1));
         p.idle_time = floor(random(DAY_LENGTH - current_sim_time()));
         p.queue_arrival_time = 0;
@@ -180,7 +176,7 @@ class Elevator {
       public void run() {
         ELEVATOR_REQUEST_QUEUE.get(current_floor).add(p);
         p.queue_arrival_time = current_sim_time();
-        Elevator temp = cont.request_elevator(current_floor, getPersonDirection(p.dest));
+        Elevator temp = cont.request_elevator(current_floor, getPersonDirection(p, current_floor));
         _DEBUG("Person with destination " + p.dest + " has requested Elevator #" + temp.designation_num + " from floor " + current_floor);
         
         // Print the Elevator-Request-Queue for floor(location)

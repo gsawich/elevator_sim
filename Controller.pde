@@ -15,16 +15,19 @@ class Controller {
     int bestEle = 0;
     for (int i=0; i < NUM_ELEVATORS; i++) {
       //if (!(bank[i].isFull())) { //ignore full elevators
-        if ((bank[i].getDirection()*dir) >=0) { //if elevator is going in the right direction or stopped
-          int dist = abs(bank[i].getLocation() - floor);
-          if (dist < bestDist) {
-            bestDist = dist;
-            bestEle = i;
+      int eleDir = bank[i].getDirection();
+        if ((eleDir*dir) <=0) { //if elevator is going in the right direction or stopped
+          if ((bank[i].getLocation() - floor)*eleDir <= 0) {
+            int dist = abs(bank[i].getLocation() - floor);
+            if (dist < bestDist) {
+              bestDist = dist;
+              bestEle = i;
+          }
           }
         }
       //}
     }
-    if (floor > 0 && !bank[bestEle].future_event.contains(floor)) {
+    if (floor != 0 && !bank[bestEle].future_event.contains(floor)) {
         bank[bestEle].future_event.add(floor);
         bank[bestEle].sortEvents();
     }
