@@ -105,6 +105,7 @@ class Elevator {
           fullfillment = true;
           if (location > 0) 
             SCHEDULE_FLOOR_QUEUE(passengers.get(i), location);
+          STATS.gather_trip_length(current_sim_time() - passengers.get(i).trip_start_time);
           passengers.remove(i);
           future_event.remove(new Integer(location));
           sortEvents();          
@@ -133,6 +134,7 @@ class Elevator {
             STATS.gather_wait_times(p.queue_arrival_time);
             p.queue_arrival_time = 0;
             passengers.add(p);
+            p.trip_start_time = current_sim_time();
             ELEVATOR_REQUEST_QUEUE.get(location).remove(p);
             _DEBUG("Person with destination " + p.dest + " loaded onto Elevator #" + designation_num);
             

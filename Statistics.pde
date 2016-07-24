@@ -12,6 +12,9 @@ public class Statistics {
   private ArrayList<Integer> ELEVATOR_MAX_CAPACITY;
   private float PERSON_WAIT_TIME;
   private float MAX_WAIT_TIME;
+  private float AVG_TRIP_LENGTH;
+  private float MAX_TRIP_LENGTH;
+  private float MIN_TRIP_LENGTH;
     
   Statistics() {
     STAT0 = 0;
@@ -26,6 +29,9 @@ public class Statistics {
     ELEVATOR_MAX_CAPACITY = new ArrayList<Integer>();
     PERSON_WAIT_TIME = 0.0;
     MAX_WAIT_TIME = 0.0;
+    AVG_TRIP_LENGTH = 0.0;
+    MAX_TRIP_LENGTH = 0.0;
+    MIN_TRIP_LENGTH = 90000;
     
     // Change default ArrayList values from "null" to "0"
     for (int i = 0; i < 4; i++)
@@ -77,7 +83,17 @@ public class Statistics {
   }
   
   // Get the average trip-length a.k.a the amount of time a person waits on the elevator while going to their destination
-  public void gather_trip_length() {}
+  public void gather_trip_length(float new_trip_length) {
+    call_count.set(STAT3, call_count.get(STAT3) + 1);
+    float current_size = AVG_TRIP_LENGTH * (call_count.get(STAT3) - 1) + new_trip_length;
+    AVG_TRIP_LENGTH = current_size / call_count.get(STAT3);
+    
+    if (new_trip_length > MAX_TRIP_LENGTH)
+      MAX_TRIP_LENGTH = new_trip_length;
+
+    if (new_trip_length < MIN_TRIP_LENGTH)
+      MIN_TRIP_LENGTH = new_trip_length;
+  }
   
   // Generate a report of the final statistics collected throughout the simulation run-time
   public void generate_report() {
@@ -115,6 +131,10 @@ public class Statistics {
                       " (on Elevator " + ELEVATOR_MAX_CAPACITY.indexOf(Collections.max(ELEVATOR_MAX_CAPACITY)) + ")";
     String[] stat_2_2 = gen_arr("Average capacity for Elevator #", ELEVATOR_AVG_CAPACITY);
     String[] stat_2_3 = gen_int_arr("Maximum capacity for Elevator #", ELEVATOR_MAX_CAPACITY);
+    String stat_3 = "  Trip Lengths";
+    String stat_3_0 = "Overall average trip length: " + get_real_time(AVG_TRIP_LENGTH);
+    String stat_3_1 = "Overall maximum trip length: " + get_real_time(MAX_TRIP_LENGTH);
+    String stat_3_2 = "Overall minimum trip length: " + get_real_time(MIN_TRIP_LENGTH);
     
     // Report Header
     print(report_header);
@@ -144,6 +164,12 @@ public class Statistics {
       println(f0 + c);
     for (String d : stat_2_3)
       println(f0 + d);
+      
+    // Header: Trip Lengths
+    print(section_header_a + stat_3 + section_header_b);
+    
+    // Data: Trip Lengths
+    print(f0 + stat_3_0 + _newline_ + f0 + stat_3_1 + _newline_ + f0 + stat_3_2 + _newline_);
   }
   
   // Helper method(s) for the Statistics class  
