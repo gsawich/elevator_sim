@@ -24,9 +24,9 @@ class Elevator {
   
   public int getDirection() {
     int direction = 0;
-    //if (future_event.isEmpty()) // direction is always up for an elevator at floor 0
-    //  direction = 1;
-    if (location - future_event.get(0) != 0)
+    if (future_event.isEmpty()) // direction is always up for an elevator at floor 0
+      direction = 0;
+    else if (location - future_event.get(0) != 0)
       direction = (future_event.get(0) - location)/(abs(location-future_event.get(0)));
     else {
       direction = 0;
@@ -126,8 +126,8 @@ class Elevator {
     if (stopped == true) {
       _DEBUG("Elevator #" + designation_num + " :: fill_elevator() started step 2");
       
-      if (ELEVATOR_REQUEST_QUEUE.get(location).size() > 0) {
-        for (int i = 0; i < ELEVATOR_REQUEST_QUEUE.get(location).size(); i++) {
+      for (int i = 0; i < ELEVATOR_REQUEST_QUEUE.get(location).size(); i++) {
+        if (ELEVATOR_REQUEST_QUEUE.get(location).size() > 0) {
           Person p = ELEVATOR_REQUEST_QUEUE.get(location).get(i);
           if (passengers.size() < MAX_ELEVATOR_CAPACITY && (getPersonDirection(p, location)*direction) >= 0) {
             STATS.gather_wait_times(p.queue_arrival_time);
@@ -151,24 +151,33 @@ class Elevator {
   
   public void sortEvents() {
     int dir = getDirection();
+    ArrayList backward_event = new ArrayList();
     Collections.sort(future_event);
     if (dir == -1)
       Collections.reverse(future_event);
+    for (int i = 0; i < future_event.size(); i++) { 
+      if (((future_event.get(i) - location) * dir) < 0) {
+        backward_event.add(future_event.get(i));
+        future_event.remove(i);
+      }
+      Collections.sort(backward_event);
+      Collections.reverse(backward_event);
+    }
+    future_event.addAll(backward_event);
   }
   
   public void SCHEDULE_FLOOR_QUEUE(final Person p, final int current_floor) {   
     // Determine if next destination is non-zero
-    if (p.single_trip)
-      p.dest = 0;
-    else {
-      if (current_sim_time() < DAY_LENGTH) {
-        while (p.dest != current_floor)
+    if (!p.single_trip && current_sim_time() < DAY_LENGTH) {
         p.dest = floor(random(MAX_FLOORS - 1));
+        while (p.dest == current_floor)
+          p.dest = floor(random(MAX_FLOORS - 1));
         p.idle_time = floor(random(DAY_LENGTH - current_sim_time()));
         p.queue_arrival_time = 0;
       }
-      else
+      else {
         p.dest = 0;
+        p.idle_time = floor(random(5000));
     }
     final ScheduledThreadPoolExecutor queue_add = new ScheduledThreadPoolExecutor(5);
     queue_add.schedule (new Runnable () {

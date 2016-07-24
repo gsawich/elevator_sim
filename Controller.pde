@@ -27,7 +27,7 @@ class Controller {
         }
       //}
     }
-    if (floor != 0 && !bank[bestEle].future_event.contains(floor)) {
+    if (!bank[bestEle].future_event.contains(floor)) {
         bank[bestEle].future_event.add(floor);
         bank[bestEle].sortEvents();
     }

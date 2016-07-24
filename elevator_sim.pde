@@ -9,7 +9,7 @@ private static final boolean __DEBUGING_TO_FILE__ = false;
 private static int __debug__p_count;
 
 // Global constants
-public static final int FRAME_RATE = 10;
+public static final int FRAME_RATE = 30;
 public static final int MAX_ELEVATOR_CAPACITY = 9;
 public static final int MAX_FLOORS = 30;
 public static final int MAX_EMPLOYEES = 60;
