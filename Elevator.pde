@@ -170,8 +170,12 @@ class Elevator {
   }
   
   public void SCHEDULE_FLOOR_QUEUE(final Person p, final int current_floor) {   
-    // Determine if next destination is non-zero
-    if (!p.single_trip && current_sim_time() < DAY_LENGTH) {
+    final ScheduledThreadPoolExecutor queue_add = new ScheduledThreadPoolExecutor(5);
+    queue_add.schedule (new Runnable () {
+      @Override 
+      public void run() {
+            // Determine if next destination is non-zero
+    if (p.single_trip && current_sim_time() < DAY_LENGTH) {
         p.dest = floor(random(MAX_FLOORS - 1));
         while (p.dest == current_floor)
           p.dest = floor(random(MAX_FLOORS - 1));
@@ -180,13 +184,9 @@ class Elevator {
       }
       else {
         p.dest = 0;
-        p.single_trip = true;
+        p.single_trip = false;
         p.idle_time = floor(random(5000));
     }
-    final ScheduledThreadPoolExecutor queue_add = new ScheduledThreadPoolExecutor(5);
-    queue_add.schedule (new Runnable () {
-      @Override 
-      public void run() {
         ELEVATOR_REQUEST_QUEUE.get(current_floor).add(p);
         p.queue_arrival_time = current_sim_time();
         Elevator temp = cont.request_elevator(current_floor, getPersonDirection(p, current_floor));

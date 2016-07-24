@@ -81,14 +81,14 @@ public void draw() {
     for (int j = 0; j < ELEVATOR_REQUEST_QUEUE.get(i).size(); j++) {
       Person p = ELEVATOR_REQUEST_QUEUE.get(i).get(j);
       if (!p.type) {
-        fill(200, 0, 0);
+        fill(200, 0, 0); // Red for Employee
       }
       else {
-        fill(0, 0, 200);
+        fill(0, 0, 200); // Blue for guest
       }
       textAlign(CENTER);
-      text(p.dest+1, (width-180)-(j*6), fy+4);
-      rect((width-180)-(j*6), fy, 3, 3);
+      text(p.dest+1, (width-(60+(40*NUM_ELEVATORS)))-(j*6), fy+4);
+      rect((width-(60+(40*NUM_ELEVATORS)))-(j*6), fy, 3, 3);
     }
   }
   // draw elevators
@@ -128,7 +128,12 @@ public void draw() {
       queues_free = false;
     }
   }
-  if (current_sim_time()>= DAY_LENGTH && queues_free) {
+  for (Elevator e:cont.bank) {
+    if (e.passengers.size() > 0)
+      queues_free = false;
+  }
+  
+  if (current_sim_time()>= DAY_LENGTH && queues_free==true) {
     noLoop();
     println("\n\n\n");
     STATS.generate_report();
@@ -208,22 +213,22 @@ private ArrayList<Float> arrival_frequencies() {
   float guest_frequency = 0;
   int refresh_interval = 0; // lets generate_people to clear its counters when a new frequency becomes valid
   
-  if (current_sim_time() < 10000) {
+  if (current_sim_time() < (DAY_LENGTH/9)) {
     emp_frequency = 0.75;
     guest_frequency = 0.15;
     refresh_interval = 1;
   }
-  else if (current_sim_time() >= 10000 && current_sim_time() < 30000) {
+  else if (current_sim_time() >= 10000 && current_sim_time() < (DAY_LENGTH/2)) {
     emp_frequency = 0.25;
     guest_frequency = 0.40;
     refresh_interval = 2;
   }
-  else if (current_sim_time() >= 30000 && current_sim_time() < 50000) {
+  else if (current_sim_time() >= 30000 && current_sim_time() < (DAY_LENGTH/1.5)) {
     emp_frequency = 0.0;
     guest_frequency = 0.30;
     refresh_interval = 3;
   }
-  else if (current_sim_time() >= 50000 && current_sim_time() < 90000) {
+  else if (current_sim_time() >= 50000 && current_sim_time() < DAY_LENGTH) {
     emp_frequency = 0.0;
     guest_frequency = 0.15;
     refresh_interval = 4;
